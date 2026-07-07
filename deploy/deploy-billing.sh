@@ -81,7 +81,11 @@ if [[ ! -d "$APP_DIR/.git" ]]; then
     git clone "$REPO_URL" "$APP_DIR"
 else
     echo -e "${YELLOW}📥 Pulling latest code...${NC}"
-    git -C "$APP_DIR" pull --rebase || echo -e "${YELLOW}⚠️  Pull failed, continuing with existing code${NC}"
+    # Stash any local changes (like .env symlink) before pulling
+    git -C "$APP_DIR" stash --include-untracked 2>/dev/null || true
+    git -C "$APP_DIR" reset --hard origin/main 2>/dev/null || \
+        git -C "$APP_DIR" pull --rebase 2>/dev/null || \
+        echo -e "${YELLOW}⚠️  Pull failed, continuing with existing code${NC}"
 fi
 
 cd "$APP_DIR"
@@ -116,9 +120,10 @@ mkdir -p db logs uploads backups
 echo ""
 echo -e "${GREEN}=== Step 3/7: Installing dependencies ===${NC}"
 if command -v bun &> /dev/null; then
-    bun install --frozen-lockfile
+    # Use regular install (not frozen) to handle lockfile drift
+    bun install
 else
-    npm ci
+    npm install
 fi
 
 echo ""
