@@ -170,20 +170,28 @@ cp .env.production .next/standalone/.env
 # ============================================
 echo ""
 echo -e "${GREEN}=== Step 6/7: Starting PM2 process ===${NC}"
-if pm2 describe billdesk-pro &> /dev/null; then
-    pm2 restart billdesk-pro --update-env
+
+# Use full path to pm2 (avoid PATH issues in non-interactive shells)
+PM2_BIN="$(command -v pm2 || echo /usr/bin/pm2)"
+echo -e "${YELLOW}Using pm2: $PM2_BIN${NC}"
+
+if $PM2_BIN describe billdesk-pro &> /dev/null; then
+    $PM2_BIN restart billdesk-pro --update-env
 else
-    pm2 start deploy/ecosystem.config.cjs --env production
+    $PM2_BIN start deploy/ecosystem.config.cjs --env production
 fi
-pm2 save
+$PM2_BIN save
 echo -e "${GREEN}✓ billdesk-pro process running on port $APP_PORT${NC}"
 
+# Make sure pm2 starts on boot
+$PM2_BIN startup systemd -u root --hp /root 2>/dev/null || true
+
 # ============================================
-# 6. Caddy block
+# 6. Nginx config (NOT Caddy — trade uses nginx)
 # ============================================
 echo ""
-echo -e "${GREEN}=== Step 7/7: Caddy config ===${NC}"
-bash deploy/caddy-add-block.sh
+echo -e "${GREEN}=== Step 7/7: Nginx config + SSL ===${NC}"
+bash deploy/nginx-add-site.sh
 
 # ============================================
 # 7. Final health check
@@ -229,8 +237,8 @@ echo -e "${CYAN}║       🎉 BILLING APP DEPLOYED!              ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${GREEN}Sites on this VPS:${NC}"
-echo "  📊 $TRADE_DOMAIN   → port 3000 (unchanged)"
-echo "  🧾 $DOMAIN  → port $APP_PORT (new)"
+echo "  📊 $TRADE_DOMAIN   → port 3000 (nifty-web, systemd)"
+echo "  🧾 $DOMAIN → port $APP_PORT (billdesk-pro, PM2)"
 echo ""
 
 if [[ "$BILLING_STATUS" == "200" ]] || [[ "$BILLING_STATUS" == "301" ]] || [[ "$BILLING_STATUS" == "302" ]]; then
@@ -239,7 +247,7 @@ else
     echo -e "${YELLOW}⚠️  billing site returned $BILLING_STATUS${NC}"
     echo "Likely causes:"
     echo "  1. DNS not propagated yet (wait 5-30 min, then retry)"
-    echo "  2. SSL still provisioning (Caddy auto-fetches, give it 30 sec)"
+    echo "  2. SSL still provisioning via certbot"
     echo "  3. App not started yet — check: pm2 logs billdesk-pro"
 fi
 echo ""
@@ -248,8 +256,8 @@ echo "  👑 Super Admin: admin@billdesk.pro / admin123"
 echo "  🏪 Tenant:      rahul@sharma-electronics.in / rahul123"
 echo ""
 echo -e "${YELLOW}Useful commands:${NC}"
-echo "  pm2 status                    # see both apps"
+echo "  pm2 status                    # see PM2 processes"
 echo "  pm2 logs billdesk-pro         # billing logs"
-echo "  sudo systemctl status caddy   # reverse proxy"
-echo "  sudo journalctl -u caddy -f   # caddy logs"
+echo "  sudo systemctl status nginx   # reverse proxy"
+echo "  sudo systemctl status nifty-web  # trade app"
 echo ""
