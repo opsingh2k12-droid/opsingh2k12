@@ -1,0 +1,251 @@
+// BillDesk Pro — Multi-tenant Billing SaaS Schema
+// Layer A: Platform (super admin) — Tenants, Plans, Subscriptions, PlatformPayments
+// Layer B: Tenant (per-business) — Items, Parties, Invoices, Purchases, Payments
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============ PLATFORM LAYER (Layer A) ============
+
+model Tenant {
+  id            String   @id @default(cuid())
+  businessName  String
+  legalName     String?
+  gstin         String?
+  pan           String?
+  address       String?
+  city          String?
+  state         String?
+  stateCode     String?
+  phone         String?
+  email         String?
+  status        String   @default("trial") // trial | active | suspended | cancelled
+  trialEndsAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  subscriptions Subscription[]
+  items         Item[]
+  parties       Party[]
+  invoices      Invoice[]
+  purchases     Purchase[]
+  payments      Payment[]
+  activityLogs  ActivityLog[]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  passwordHash  String
+  role          String    @default("owner") // super_admin | owner | staff | accountant
+  tenantId      String?
+  tenant        Tenant?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Plan {
+  id              String   @id @default(cuid())
+  name            String   // Free | Starter | Pro | Enterprise
+  priceMonthly    Float    @default(0)
+  priceYearly     Float    @default(0)
+  invoiceLimit    Int      @default(0) // 0 = unlimited
+  userLimit       Int      @default(1)
+  features        String   // JSON string
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  subscriptions   Subscription[]
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  planId          String
+  plan            Plan     @relation(fields: [planId], references: [id])
+  status          String   @default("active") // active | cancelled | past_due | trial
+  billingCycle    String   @default("monthly") // monthly | yearly
+  currentPeriodEnd DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  payments        PlatformPayment[]
+}
+
+model PlatformPayment {
+  id              String   @id @default(cuid())
+  subscriptionId  String
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  amount          Float
+  currency        String   @default("INR")
+  gateway         String   @default("razorpay") // razorpay | phonepe | manual
+  gatewayRef      String?
+  status          String   @default("paid") // paid | failed | pending | refunded
+  paidAt          DateTime @default(now())
+  createdAt       DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  action    String   // tenant.signup | invoice.created | payment.received | etc.
+  detail    String?
+  createdAt DateTime @default(now())
+}
+
+// ============ TENANT BUSINESS LAYER (Layer B) ============
+
+model Item {
+  id           String  @id @default(cuid())
+  tenantId     String
+  tenant       Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name         String
+  sku          String?
+  hsn          String?
+  category     String?
+  unit         String  @default("pcs")
+  salePrice    Float
+  purchasePrice Float  @default(0)
+  gstRate      Float   @default(18) // 0, 5, 12, 18, 28
+  stockQty     Int     @default(0)
+  reorderLevel Int     @default(10)
+  barcode      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  invoiceItems InvoiceItem[]
+  purchaseItems PurchaseItem[]
+}
+
+model Party {
+  id           String  @id @default(cuid())
+  tenantId     String
+  tenant       Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name         String
+  type         String  @default("customer") // customer | supplier | both
+  gstin        String?
+  phone        String?
+  email        String?
+  address      String?
+  city         String?
+  state        String?
+  stateCode    String?
+  openingBalance Float @default(0) // positive = receivable, negative = payable
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  invoices     Invoice[]
+  purchases    Purchase[]
+  payments     Payment[]
+}
+
+model Invoice {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoiceNumber   String
+  partyId         String
+  party           Party    @relation(fields: [partyId], references: [id])
+  invoiceDate     DateTime @default(now())
+  supplyType      String   @default("intra") // intra (CGST+SGST) | inter (IGST)
+  status          String   @default("unpaid") // unpaid | partial | paid | overdue | cancelled
+  subtotal        Float    @default(0)
+  discountPct     Float    @default(0)
+  discountAmount  Float    @default(0)
+  taxableAmount   Float    @default(0)
+  cgst            Float    @default(0)
+  sgst            Float    @default(0)
+  igst            Float    @default(0)
+  totalGst        Float    @default(0)
+  grandTotal      Float    @default(0)
+  paidAmount      Float    @default(0)
+  balanceDue      Float    @default(0)
+  notes           String?
+  terms           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items           InvoiceItem[]
+  payments        Payment[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  itemId      String?
+  item        Item?   @relation(fields: [itemId], references: [id])
+  name        String
+  hsn         String?
+  qty         Float
+  rate        Float
+  gstRate     Float
+  amount      Float   // qty * rate
+  taxableAmount Float
+  cgst        Float   @default(0)
+  sgst        Float   @default(0)
+  igst        Float   @default(0)
+}
+
+model Purchase {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  billNumber      String
+  partyId         String
+  party           Party    @relation(fields: [partyId], references: [id])
+  billDate        DateTime @default(now())
+  status          String   @default("unpaid") // unpaid | partial | paid
+  subtotal        Float    @default(0)
+  taxableAmount   Float    @default(0)
+  cgst            Float    @default(0)
+  sgst            Float    @default(0)
+  igst            Float    @default(0)
+  totalGst        Float    @default(0) // ITC
+  grandTotal      Float    @default(0)
+  paidAmount      Float    @default(0)
+  balanceDue      Float    @default(0)
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  items           PurchaseItem[]
+}
+
+model PurchaseItem {
+  id          String  @id @default(cuid())
+  purchaseId  String
+  purchase    Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  itemId      String?
+  item        Item?   @relation(fields: [itemId], references: [id])
+  name        String
+  hsn         String?
+  qty         Float
+  rate        Float
+  gstRate     Float
+  amount      Float
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoiceId   String?
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  partyId     String?
+  party       Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  amount      Float
+  method      String   @default("cash") // cash | upi | card | bank | cheque
+  reference   String?
+  paidAt      DateTime @default(now())
+  direction   String   @default("in") // in (customer->us) | out (us->supplier)
+  createdAt   DateTime @default(now())
+}

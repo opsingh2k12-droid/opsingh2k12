@@ -1,0 +1,69 @@
+# ============================================
+# Caddyfile — BillDesk Pro Reverse Proxy
+# ============================================
+# Replace YOUR_DOMAIN.COM with your actual domain.
+# Caddy auto-provisions and renews Let's Encrypt SSL certificates.
+# Docs: https://caddyserver.com/docs/
+
+YOUR_DOMAIN.COM {
+    # Redirect www to non-www (optional — comment out if not needed)
+    # redir www.YOUR_DOMAIN.COM{uri} permanent
+
+    # Reverse proxy to Next.js app on port 3000
+    reverse_proxy localhost:3000 {
+        # Forward host header so Next.js knows the real domain
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Compression
+    encode gzip zstd
+
+    # Security headers
+    header {
+        # Strict Transport Security — force HTTPS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # Prevent MIME-type sniffing
+        X-Content-Type-Options "nosniff"
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-XSS-Protection "1; mode=block"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Permissions policy
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        # HSTS preload eligibility
+        # Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=production
+    }
+
+    # Gzip static assets
+    @static {
+        path *.js *.css *.png *.jpg *.jpeg *.webp *.avif *.svg *.gif *.woff2 *.ico
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # Logs
+    log {
+        output file /var/log/caddy/billdesk-access.log {
+            roll_size 100mb
+            roll_keep 10
+            roll_keep_for 720h
+        }
+        format json
+    }
+
+    # Custom error page (optional)
+    # handle_errors {
+    #     rewrite * /500.html
+    #     file_server
+    # }
+}
+
+# Optional: redirect HTTP to HTTPS (Caddy does this automatically,
+# but explicit is better for clarity)
+# http://YOUR_DOMAIN.COM {
+#     redir https://{host}{uri} permanent
+# }

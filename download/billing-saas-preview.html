@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BillDesk Pro — Design Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0D9488;
+    --primary-dark: #0F766E;
+    --primary-light: #CCFBF1;
+    --primary-soft: #F0FDFA;
+    --accent: #F59E0B;
+    --accent-light: #FEF3C7;
+    --bg: #F8FAFC;
+    --surface: #FFFFFF;
+    --border: #E2E8F0;
+    --border-strong: #CBD5E1;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --text-soft: #94A3B8;
+    --success: #16A34A;
+    --success-light: #DCFCE7;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --warning: #D97706;
+    --warning-light: #FEF3C7;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15,23,42,0.07), 0 2px 4px -2px rgba(15,23,42,0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(15,23,42,0.08), 0 4px 6px -4px rgba(15,23,42,0.04);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  a { color: inherit; text-decoration: none; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+  /* ============ LOGIN SCREEN ============ */
+  #login-screen {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--surface);
+  }
+  .login-left {
+    background: linear-gradient(135deg, #0D9488 0%, #0F766E 50%, #134E4A 100%);
+    color: white;
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-left::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .login-left::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; left: -50px;
+    width: 350px; height: 350px;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 50%;
+  }
+  .login-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 22px;
+    position: relative; z-index: 1;
+  }
+  .login-brand-logo {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .login-hero { position: relative; z-index: 1; }
+  .login-hero h1 {
+    font-size: 38px; font-weight: 800; line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .login-hero p {
+    font-size: 16px; opacity: 0.85;
+    max-width: 420px; line-height: 1.6;
+  }
+  .login-features {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .login-feature {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; opacity: 0.95;
+  }
+  .login-feature-icon {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .login-right {
+    padding: 64px 56px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .login-form { width: 100%; max-width: 380px; }
+  .login-form h2 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .login-form .subtitle { color: var(--text-muted); margin-bottom: 28px; }
+  .form-tabs {
+    display: flex; background: var(--bg);
+    padding: 4px; border-radius: 10px;
+    margin-bottom: 24px;
+  }
+  .form-tab {
+    flex: 1; padding: 10px;
+    text-align: center; font-weight: 600; font-size: 13px;
+    color: var(--text-muted); border-radius: 7px;
+    transition: all 0.2s;
+  }
+  .form-tab.active {
+    background: var(--surface); color: var(--text);
+    box-shadow: var(--shadow-sm);
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text); margin-bottom: 6px;
+  }
+  .form-input {
+    width: 100%; padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 14px;
+    background: var(--surface); color: var(--text);
+    transition: all 0.15s;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+  }
+  .form-input::placeholder { color: var(--text-soft); }
+  .btn-primary {
+    width: 100%; padding: 12px;
+    background: var(--primary); color: white;
+    border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 14px;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .login-trial {
+    margin-top: 16px; text-align: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .login-trial strong { color: var(--primary); }
+
+  /* ============ APP SHELL ============ */
+  .app { display: none; min-height: 100vh; }
+  .app.active { display: grid; grid-template-columns: 240px 1fr; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 16px;
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 8px 20px;
+    font-weight: 800; font-size: 18px;
+  }
+  .sidebar-brand-logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+  .sidebar-tenant {
+    padding: 10px 12px; margin-bottom: 16px;
+    background: var(--primary-soft);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px;
+  }
+  .sidebar-tenant-avatar {
+    width: 32px; height: 32px;
+    background: var(--primary); color: white;
+    border-radius: 50%; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .sidebar-tenant-info { flex: 1; min-width: 0; }
+  .sidebar-tenant-name { font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-tenant-plan { color: var(--primary-dark); font-size: 11px; font-weight: 500; }
+
+  .nav-section { margin-bottom: 8px; }
+  .nav-section-title {
+    font-size: 10px; font-weight: 700; color: var(--text-soft);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 12px 12px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: var(--radius-sm);
+    color: var(--text-muted); font-weight: 500; font-size: 13.5px;
+    transition: all 0.15s; width: 100%; text-align: left;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+  .nav-item.active {
+    background: var(--primary); color: white;
+    box-shadow: var(--shadow-sm);
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-item .badge {
+    margin-left: auto;
+    background: var(--accent); color: white;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px;
+  }
+  .nav-item.active .badge { background: rgba(255,255,255,0.25); }
+  .sidebar-footer {
+    margin-top: auto; padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .sidebar-footer .nav-item { font-size: 13px; }
+
+  /* ============ TOP BAR ============ */
+  .main-area { display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-search {
+    flex: 1; max-width: 480px;
+    position: relative;
+  }
+  .topbar-search input {
+    width: 100%; padding: 9px 14px 9px 38px;
+    background: var(--bg); border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 13.5px;
+    transition: all 0.15s;
+  }
+  .topbar-search input:focus {
+    outline: none; background: var(--surface);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+  }
+  .topbar-search svg {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px; color: var(--text-soft);
+  }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .icon-btn {
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    transition: all 0.15s;
+    position: relative;
+  }
+  .icon-btn:hover { background: var(--bg); color: var(--text); }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .icon-btn .dot {
+    position: absolute; top: 8px; right: 9px;
+    width: 8px; height: 8px;
+    background: var(--danger); border-radius: 50%;
+    border: 2px solid var(--surface);
+  }
+  .topbar-user {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 12px 6px 6px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+  .topbar-user:hover { background: var(--bg); }
+  .user-avatar {
+    width: 32px; height: 32px;
+    background: var(--primary); color: white;
+    border-radius: 50%; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .user-info { font-size: 12px; line-height: 1.3; }
+  .user-name { font-weight: 600; }
+  .user-role { color: var(--text-muted); font-size: 11px; }
+  .btn-new {
+    background: var(--primary); color: white;
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 13px;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .btn-new:hover { background: var(--primary-dark); }
+  .btn-new svg { width: 16px; height: 16px; }
+
+  /* ============ CONTENT ============ */
+  .content { padding: 28px; flex: 1; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
+  }
+  .page-title { font-size: 22px; font-weight: 700; }
+  .page-subtitle { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+  .page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-secondary {
+    background: var(--surface); color: var(--text);
+    padding: 9px 14px; border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 13px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { background: var(--bg); border-color: var(--border-strong); }
+  .btn-secondary svg { width: 15px; height: 15px; }
+
+  /* ============ KPI CARDS ============ */
+  .kpi-grid {
+    display: grid; gap: 16px; margin-bottom: 28px;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    transition: all 0.15s;
+  }
+  .kpi-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+  .kpi-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .kpi-label { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .kpi-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kpi-icon svg { width: 18px; height: 18px; }
+  .kpi-icon.teal { background: var(--primary-soft); color: var(--primary-dark); }
+  .kpi-icon.amber { background: var(--accent-light); color: var(--accent); }
+  .kpi-icon.green { background: var(--success-light); color: var(--success); }
+  .kpi-icon.red { background: var(--danger-light); color: var(--danger); }
+  .kpi-value { font-size: 24px; font-weight: 700; }
+  .kpi-trend {
+    font-size: 11px; font-weight: 600; margin-top: 4px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .kpi-trend.up { color: var(--success); }
+  .kpi-trend.down { color: var(--danger); }
+
+  /* ============ SECTIONS / CARDS ============ */
+  .grid-2 {
+    display: grid; gap: 16px; margin-bottom: 16px;
+    grid-template-columns: 2fr 1fr;
+  }
+  .grid-2-even { grid-template-columns: 1fr 1fr; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-weight: 600; font-size: 14px; }
+  .card-link { color: var(--primary); font-size: 12px; font-weight: 600; }
+  .card-body { padding: 8px 0; }
+  .card-body.tight { padding: 14px; }
+
+  /* ============ TABLES ============ */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; padding: 10px 18px;
+    color: var(--text-muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+  .cell-main { font-weight: 600; }
+  .cell-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .pill {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 99px;
+    font-size: 11px; font-weight: 600;
+  }
+  .pill-success { background: var(--success-light); color: var(--success); }
+  .pill-warning { background: var(--warning-light); color: var(--warning); }
+  .pill-danger { background: var(--danger-light); color: var(--danger); }
+  .pill-neutral { background: var(--bg); color: var(--text-muted); }
+  .pill-primary { background: var(--primary-light); color: var(--primary-dark); }
+
+  /* ============ LOW STOCK LIST ============ */
+  .list-item {
+    padding: 12px 18px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--danger-light); color: var(--danger);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .list-item-icon svg { width: 16px; height: 16px; }
+  .list-item-content { flex: 1; min-width: 0; }
+  .list-item-title { font-weight: 600; font-size: 13px; }
+  .list-item-sub { font-size: 11px; color: var(--text-muted); }
+  .list-item-action {
+    font-size: 12px; color: var(--primary); font-weight: 600;
+  }
+
+  /* ============ INVOICE CREATE FORM ============ */
+  .invoice-grid {
+    display: grid; grid-template-columns: 1fr 320px;
+    gap: 20px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .invoice-meta {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    padding: 16px 18px; background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .items-table th { background: var(--bg); }
+  .items-table td { padding: 10px 14px; }
+  .items-table input, .items-table select {
+    width: 100%; padding: 7px 10px;
+    border: 1px solid var(--border); border-radius: 6px;
+    font-family: inherit; font-size: 13px;
+    background: var(--surface);
+  }
+  .items-table input:focus, .items-table select:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.1);
+  }
+  .add-row-btn {
+    width: 100%; padding: 10px;
+    color: var(--primary); font-weight: 600; font-size: 13px;
+    border: 1px dashed var(--primary);
+    background: var(--primary-soft);
+    transition: all 0.15s;
+  }
+  .add-row-btn:hover { background: var(--primary-light); }
+  .totals-section { padding: 16px 18px; background: var(--bg); }
+  .totals-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; font-size: 13px;
+  }
+  .totals-row.divider { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
+  .totals-row.grand {
+    font-size: 18px; font-weight: 700;
+    border-top: 2px solid var(--text); padding-top: 12px; margin-top: 6px;
+  }
+  .totals-row .label { color: var(--text-muted); }
+  .totals-row.grand .label { color: var(--text); }
+
+  .invoice-summary-card {
+    position: sticky; top: 90px;
+  }
+  .summary-block {
+    padding: 16px 18px; border-bottom: 1px solid var(--border);
+  }
+  .summary-block:last-child { border-bottom: none; }
+  .summary-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .summary-value { font-size: 16px; font-weight: 700; }
+  .summary-actions { padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+  .btn-full {
+    width: 100%; padding: 11px;
+    border-radius: var(--radius-sm); font-weight: 600; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .btn-teal { background: var(--primary); color: white; }
+  .btn-teal:hover { background: var(--primary-dark); }
+  .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg); }
+  .btn-whatsapp { background: #25D366; color: white; }
+  .btn-whatsapp:hover { background: #1FB855; }
+  .btn-full svg { width: 16px; height: 16px; }
+
+  /* ============ ITEMS GRID ============ */
+  .filter-bar {
+    display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+  }
+  .filter-chip {
+    padding: 7px 14px; border-radius: 99px;
+    font-size: 12px; font-weight: 600;
+    background: var(--surface); color: var(--text-muted);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .filter-chip:hover { border-color: var(--border-strong); }
+  .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .items-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .item-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    transition: all 0.15s; cursor: pointer;
+  }
+  .item-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-strong); transform: translateY(-1px); }
+  .item-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .item-thumb {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--primary-soft); color: var(--primary-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .item-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+  .item-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+  .item-price-row { display: flex; align-items: center; justify-content: space-between; }
+  .item-price { font-weight: 700; font-size: 15px; }
+  .item-stock { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+  .item-stock.ok { background: var(--success-light); color: var(--success); }
+  .item-stock.low { background: var(--warning-light); color: var(--warning); }
+  .item-stock.out { background: var(--danger-light); color: var(--danger); }
+
+  /* ============ PARTIES ============ */
+  .party-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .party-row:last-child { border-bottom: none; }
+  .party-row:hover { background: var(--bg); }
+  .party-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--primary-light); color: var(--primary-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .party-info { flex: 1; min-width: 0; }
+  .party-name { font-weight: 600; font-size: 14px; }
+  .party-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .party-balance { text-align: right; }
+  .party-amount { font-weight: 700; font-size: 14px; }
+  .party-amount.due { color: var(--danger); }
+  .party-amount.credit { color: var(--success); }
+  .party-amount-label { font-size: 11px; color: var(--text-muted); }
+
+  /* ============ REPORTS ============ */
+  .report-grid {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px;
+  }
+  .chart-card { padding: 18px; }
+  .chart-bars {
+    display: flex; align-items: flex-end; gap: 10px;
+    height: 220px; padding: 14px 0 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chart-bar-group {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .chart-bar {
+    width: 100%; max-width: 28px;
+    background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .chart-bar:hover { background: linear-gradient(180deg, var(--accent) 0%, #D97706 100%); }
+  .chart-bar-label { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+  .chart-bar-value { font-size: 10px; color: var(--text); font-weight: 600; }
+
+  .gst-breakdown {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .gst-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; background: var(--bg); border-radius: 8px;
+  }
+  .gst-label { font-size: 12px; font-weight: 500; }
+  .gst-value { font-weight: 700; font-size: 14px; }
+
+  /* ============ SETTINGS ============ */
+  .settings-grid {
+    display: grid; grid-template-columns: 220px 1fr; gap: 24px;
+  }
+  .settings-nav { display: flex; flex-direction: column; gap: 2px; }
+  .settings-nav-item {
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    text-align: left; color: var(--text-muted);
+    font-size: 13px; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .settings-nav-item:hover { background: var(--bg); color: var(--text); }
+  .settings-nav-item.active { background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+  .settings-section { padding: 22px; }
+  .settings-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .settings-section .desc { color: var(--text-muted); font-size: 12px; margin-bottom: 20px; }
+  .plan-card {
+    border: 2px solid var(--border); border-radius: var(--radius);
+    padding: 18px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.15s;
+  }
+  .plan-card.current { border-color: var(--primary); background: var(--primary-soft); }
+  .plan-name { font-weight: 700; font-size: 14px; }
+  .plan-price { font-size: 18px; font-weight: 700; margin-top: 2px; }
+  .plan-price span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .plan-features { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ============ EMPTY STATES / MISC ============ */
+  .text-muted { color: var(--text-muted); }
+  .text-right { text-align: right; }
+  .font-bold { font-weight: 700; }
+  .text-sm { font-size: 12px; }
+  .text-xs { font-size: 11px; }
+  .flex { display: flex; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .items-center { align-items: center; }
+  .mt-2 { margin-top: 8px; }
+  .mb-0 { margin-bottom: 0; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .invoice-grid { grid-template-columns: 1fr; }
+    .invoice-summary-card { position: static; }
+    .report-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    #login-screen { grid-template-columns: 1fr; }
+    .login-left { padding: 40px 28px; min-height: 200px; }
+    .login-right { padding: 32px 24px; }
+    .app.active { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .topbar { padding: 12px 16px; }
+    .content { padding: 16px; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .form-row, .form-row-3 { grid-template-columns: 1fr; }
+    .invoice-meta { grid-template-columns: 1fr 1fr; }
+    .settings-grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 18px; }
+  }
+
+  /* hidden helper */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="login-screen">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-brand-logo">B</div>
+      <span>BillDesk Pro</span>
+    </div>
+    <div class="login-hero">
+      <h1>Run your business billing like a pro.</h1>
+      <p>Inventory, GST invoicing, parties, purchase & reports — all in one place. Built for Indian businesses, ready in 2 minutes.</p>
+    </div>
+    <div class="login-features">
+      <div class="login-feature">
+        <div class="login-feature-icon">🧾</div>
+        <span>GST-compliant invoices with CGST/SGST/IGST auto-calc</span>
+      </div>
+      <div class="login-feature">
+        <div class="login-feature-icon">📦</div>
+        <span>Real-time stock tracking with low-stock alerts</span>
+      </div>
+      <div class="login-feature">
+        <div class="login-feature-icon">📊</div>
+        <span>GSTR-1 ready reports + sales/purchase summary</span>
+      </div>
+      <div class="login-feature">
+        <div class="login-feature-icon">💬</div>
+        <span>WhatsApp & email invoices in one click</span>
+      </div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form">
+      <h2>Welcome back 👋</h2>
+      <p class="subtitle">Log in to your billing dashboard</p>
+      <div class="form-tabs">
+        <button class="form-tab active" onclick="switchLoginTab(this, 'login')">Log In</button>
+        <button class="form-tab" onclick="switchLoginTab(this, 'signup')">Start Free Trial</button>
+      </div>
+      <div id="login-fields">
+        <div class="form-group">
+          <label class="form-label">Email or Phone</label>
+          <input type="text" class="form-input" placeholder="owner@business.in" value="rahul@sharma-electronics.in" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" placeholder="••••••••" value="demo1234" />
+        </div>
+      </div>
+      <div id="signup-fields" class="hidden">
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input type="text" class="form-input" placeholder="Sharma Electronics" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">GSTIN (optional)</label>
+            <input type="text" class="form-input" placeholder="27ABCDE1234F1Z5" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-input" placeholder="+91 98765 43210" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="owner@business.in" />
+        </div>
+      </div>
+      <button class="btn-primary" style="margin-top: 8px;" onclick="enterApp()">Continue →</button>
+      <p class="login-trial">No credit card needed · <strong>14-day free trial</strong> · Cancel anytime</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-logo">B</div>
+      <span>BillDesk Pro</span>
+    </div>
+    <div class="sidebar-tenant">
+      <div class="sidebar-tenant-avatar">SE</div>
+      <div class="sidebar-tenant-info">
+        <div class="sidebar-tenant-name">Sharma Electronics</div>
+        <div class="sidebar-tenant-plan">Pro Plan · Trial</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <button class="nav-item active" onclick="switchPage('dashboard', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" onclick="switchPage('invoices', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Sales / Invoices
+        <span class="badge">3</span>
+      </button>
+      <button class="nav-item" onclick="switchPage('create-invoice', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Invoice
+      </button>
+      <button class="nav-item" onclick="switchPage('items', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        Items / Inventory
+      </button>
+      <button class="nav-item" onclick="switchPage('parties', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Parties
+      </button>
+      <button class="nav-item" onclick="switchPage('purchase', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Purchase
+      </button>
+      <button class="nav-item" onclick="switchPage('reports', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reports
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Account</div>
+      <button class="nav-item" onclick="switchPage('settings', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+      <button class="nav-item" onclick="exitApp()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main area -->
+  <div class="main-area">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search invoices, parties, items..." />
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-new" onclick="switchPage('create-invoice', document.querySelectorAll('.nav-item')[2])">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Invoice
+        </button>
+        <button class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="dot"></span>
+        </button>
+        <div class="topbar-user">
+          <div class="user-avatar">RS</div>
+          <div class="user-info">
+            <div class="user-name">Rahul Sharma</div>
+            <div class="user-role">Owner</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Good morning, Rahul 👋</div>
+            <div class="page-subtitle">Here's what's happening at Sharma Electronics today</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Last 30 days
+            </button>
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Today's Sales</div>
+              <div class="kpi-icon teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">₹42,580</div>
+            <div class="kpi-trend up">▲ 12.4% vs yesterday</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Pending Dues</div>
+              <div class="kpi-icon red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">₹1,24,500</div>
+            <div class="kpi-trend down">▼ 4.2% vs last week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Low Stock Items</div>
+              <div class="kpi-icon amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">7 items</div>
+            <div class="kpi-trend down">Needs restocking</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <div class="kpi-label">Invoices This Month</div>
+              <div class="kpi-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value">186</div>
+            <div class="kpi-trend up">▲ 23 vs last month</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Recent Invoices</div>
+              <a class="card-link" onclick="switchPage('invoices', document.querySelectorAll('.nav-item')[1])">View all →</a>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Party</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="cell-main">INV-2025-0186</div><div class="cell-sub">14 items</div></td>
+                  <td><div class="cell-main">Verma Traders</div><div class="cell-sub">GSTIN: 27AAACV1234L1Z5</div></td>
+                  <td>07 Jul 2026</td>
+                  <td class="font-bold">₹28,450</td>
+                  <td><span class="pill pill-success">Paid</span></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-main">INV-2025-0185</div><div class="cell-sub">3 items</div></td>
+                  <td><div class="cell-main">Suresh Kumar</div><div class="cell-sub">Walk-in customer</div></td>
+                  <td>07 Jul 2026</td>
+                  <td class="font-bold">₹4,200</td>
+                  <td><span class="pill pill-success">Paid</span></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-main">INV-2025-0184</div><div class="cell-sub">8 items</div></td>
+                  <td><div class="cell-main">Patel Electronics</div><div class="cell-sub">GSTIN: 27AABCP9876R1Z2</div></td>
+                  <td>06 Jul 2026</td>
+                  <td class="font-bold">₹52,800</td>
+                  <td><span class="pill pill-warning">Partial · ₹20k</span></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-main">INV-2025-0183</div><div class="cell-sub">2 items</div></td>
+                  <td><div class="cell-main">Anjali Sharma</div><div class="cell-sub">Walk-in customer</div></td>
+                  <td>06 Jul 2026</td>
+                  <td class="font-bold">₹1,890</td>
+                  <td><span class="pill pill-success">Paid</span></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-main">INV-2025-0182</div><div class="cell-sub">21 items</div></td>
+                  <td><div class="cell-main">Mumbai Trade House</div><div class="cell-sub">GSTIN: 27AAACM4567P1Z7</div></td>
+                  <td>05 Jul 2026</td>
+                  <td class="font-bold">₹84,600</td>
+                  <td><span class="pill pill-danger">Unpaid</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Low Stock Alerts</div>
+              <a class="card-link" onclick="switchPage('items', document.querySelectorAll('.nav-item')[3])">Manage →</a>
+            </div>
+            <div class="card-body">
+              <div class="list-item">
+                <div class="list-item-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="list-item-content">
+                  <div class="list-item-title">Mi Power Bank 20000mAh</div>
+                  <div class="list-item-sub">HSN: 8507 · Stock: 3 units · Reorder: 15</div>
+                </div>
+                <a class="list-item-action">Reorder</a>
+              </div>
+              <div class="list-item">
+                <div class="list-item-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="list-item-content">
+                  <div class="list-item-title">USB-C Cable 1m (Braided)</div>
+                  <div class="list-item-sub">HSN: 8544 · Stock: 8 units · Reorder: 50</div>
+                </div>
+                <a class="list-item-action">Reorder</a>
+              </div>
+              <div class="list-item">
+                <div class="list-item-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="list-item-content">
+                  <div class="list-item-title">LED Bulb 12W (Pack of 4)</div>
+                  <div class="list-item-sub">HSN: 8539 · Stock: 0 units · OUT OF STOCK</div>
+                </div>
+                <a class="list-item-action">Reorder</a>
+              </div>
+              <div class="list-item">
+                <div class="list-item-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="list-item-content">
+                  <div class="list-item-title">HDMI Cable 2m (Premium)</div>
+                  <div class="list-item-sub">HSN: 8544 · Stock: 5 units · Reorder: 20</div>
+                </div>
+                <a class="list-item-action">Reorder</a>
+              </div>
+              <div class="list-item">
+                <div class="list-item-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="list-item-content">
+                  <div class="list-item-title">Bluetooth Earbuds Pro</div>
+                  <div class="list-item-sub">HSN: 8518 · Stock: 2 units · Reorder: 10</div>
+                </div>
+                <a class="list-item-action">Reorder</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CREATE INVOICE ============ -->
+      <section class="page" id="page-create-invoice">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Create Sales Invoice</div>
+            <div class="page-subtitle">GST-compliant invoice · CGST/SGST auto-calculated</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save as Draft
+            </button>
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="invoice-grid">
+          <div class="card" style="overflow: visible;">
+            <div class="invoice-meta">
+              <div>
+                <label class="form-label">Invoice No.</label>
+                <input class="form-input" value="INV-2025-0187" readonly style="background: var(--bg);" />
+              </div>
+              <div>
+                <label class="form-label">Date</label>
+                <input class="form-input" type="date" value="2026-07-07" />
+              </div>
+              <div>
+                <label class="form-label">Supply Type</label>
+                <select class="form-input">
+                  <option>Inter-state (IGST)</option>
+                  <option selected>Intra-state (CGST+SGST)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Payment Terms</label>
+                <select class="form-input">
+                  <option selected>Due on receipt</option>
+                  <option>Net 15</option>
+                  <option>Net 30</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="padding: 18px;">
+              <div class="form-row">
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label">Bill To (Customer)</label>
+                  <select class="form-input">
+                    <option>Select party...</option>
+                    <option selected>Verma Traders · 27AAACV1234L1Z5</option>
+                    <option>Suresh Kumar · Walk-in</option>
+                    <option>Patel Electronics · 27AABCP9876R1Z2</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label">Phone (for WhatsApp)</label>
+                  <input class="form-input" value="+91 98200 12345" />
+                </div>
+              </div>
+            </div>
+
+            <div style="padding: 0 18px 14px;">
+              <label class="form-label">Items</label>
+            </div>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width: 35%;">Item</th>
+                  <th>HSN</th>
+                  <th>Qty</th>
+                  <th>Rate (₹)</th>
+                  <th>GST %</th>
+                  <th>Amount</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><select><option>Mi Power Bank 20000mAh</option></select></td>
+                  <td><input value="8507" /></td>
+                  <td><input type="number" value="5" style="width: 70px;" /></td>
+                  <td><input type="number" value="1499" /></td>
+                  <td><select><option>18%</option><option>28%</option><option>12%</option><option>5%</option><option>0%</option></select></td>
+                  <td class="font-bold">₹7,495</td>
+                  <td><button class="icon-btn" style="width:30px;height:30px;color:var(--danger);"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><select><option>USB-C Cable 1m (Braided)</option></select></td>
+                  <td><input value="8544" /></td>
+                  <td><input type="number" value="10" style="width: 70px;" /></td>
+                  <td><input type="number" value="299" /></td>
+                  <td><select><option>18%</option></select></td>
+                  <td class="font-bold">₹2,990</td>
+                  <td><button class="icon-btn" style="width:30px;height:30px;color:var(--danger);"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><select><option>Bluetooth Earbuds Pro</option></select></td>
+                  <td><input value="8518" /></td>
+                  <td><input type="number" value="2" style="width: 70px;" /></td>
+                  <td><input type="number" value="2499" /></td>
+                  <td><select><option>18%</option></select></td>
+                  <td class="font-bold">₹4,998</td>
+                  <td><button class="icon-btn" style="width:30px;height:30px;color:var(--danger);"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 8px;">
+                    <button class="add-row-btn">+ Add Another Item</button>
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div style="padding: 14px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="form-label">Notes (visible on invoice)</label>
+                <textarea class="form-input" rows="2" style="resize: vertical;">Thank you for your business. Goods once sold will not be taken back.</textarea>
+              </div>
+              <div>
+                <label class="form-label">Terms & Conditions</label>
+                <textarea class="form-input" rows="2" style="resize: vertical;">Payment due within 15 days. Interest @18% p.a. on delayed payments.</textarea>
+              </div>
+            </div>
+
+            <div class="totals-section">
+              <div class="totals-row"><span class="label">Subtotal</span><span class="font-bold">₹15,483</span></div>
+              <div class="totals-row"><span class="label">Discount (5%)</span><span class="font-bold" style="color: var(--danger);">− ₹774</span></div>
+              <div class="totals-row"><span class="label">CGST (9%)</span><span>₹1,324</span></div>
+              <div class="totals-row"><span class="label">SGST (9%)</span><span>₹1,324</span></div>
+              <div class="totals-row grand"><span class="label">Total Payable</span><span>₹17,357</span></div>
+            </div>
+          </div>
+
+          <div class="card invoice-summary-card">
+            <div class="summary-block">
+              <div class="summary-label">Total Invoice Value</div>
+              <div class="summary-value" style="color: var(--primary-dark);">₹17,357</div>
+            </div>
+            <div class="summary-block">
+              <div class="summary-label">Items Count</div>
+              <div class="summary-value">3 items · 17 qty</div>
+            </div>
+            <div class="summary-block">
+              <div class="summary-label">GST Breakdown</div>
+              <div style="margin-top: 8px; font-size: 12px; line-height: 1.8;">
+                <div style="display:flex; justify-content:space-between;"><span>CGST 9%</span><span>₹1,324</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>SGST 9%</span><span>₹1,324</span></div>
+                <div style="display:flex; justify-content:space-between; font-weight: 600;"><span>Total GST</span><span>₹2,648</span></div>
+              </div>
+            </div>
+            <div class="summary-actions">
+              <button class="btn-full btn-teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Save & Generate Invoice
+              </button>
+              <button class="btn-full btn-ghost">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download PDF
+              </button>
+              <button class="btn-full btn-whatsapp">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.9L4 20l4.2-1.1a7.93 7.93 0 0 0 3.84.98h.01a7.94 7.94 0 0 0 7.93-7.93 7.88 7.88 0 0 0-2.38-5.63zm-5.55 12.2h-.01a6.58 6.58 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.59 6.59 0 0 1 10.24-8.17 6.55 6.55 0 0 1 1.93 4.66 6.58 6.58 0 0 1-6.57 6.6zm3.6-4.93c-.2-.1-1.17-.58-1.35-.64-.18-.07-.31-.1-.45.1-.13.2-.5.64-.62.77-.11.13-.23.15-.43.05a5.39 5.39 0 0 1-2.7-2.36c-.2-.35.2-.32.58-1.07.07-.13.03-.25-.02-.35-.05-.1-.45-1.08-.62-1.48-.16-.39-.32-.34-.45-.34l-.38-.01a.74.74 0 0 0-.54.25c-.18.2-.7.69-.7 1.67s.72 1.94.82 2.07c.1.13 1.4 2.13 3.4 2.99.47.2.85.33 1.14.42.48.15.92.13 1.26.08.39-.06 1.17-.48 1.34-.94.16-.46.16-.85.11-.94-.04-.08-.17-.13-.37-.23z"/></svg>
+                Send via WhatsApp
+              </button>
+              <button class="btn-full btn-ghost">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email Invoice
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INVOICES LIST ============ -->
+      <section class="page" id="page-invoices">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Sales Invoices</div>
+            <div class="page-subtitle">186 invoices this month · ₹4,82,350 total</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+            <button class="btn-new" onclick="switchPage('create-invoice', document.querySelectorAll('.nav-item')[2])">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Invoice
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active">All (186)</button>
+          <button class="filter-chip">Paid (142)</button>
+          <button class="filter-chip">Unpaid (28)</button>
+          <button class="filter-chip">Partial (16)</button>
+          <button class="filter-chip">Overdue (8)</button>
+          <div style="flex:1;"></div>
+          <button class="btn-secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Filter
+          </button>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Party</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Taxable</th>
+                <th>GST</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="cell-main">INV-2025-0186</div></td>
+                <td><div class="cell-main">Verma Traders</div><div class="cell-sub">27AAACV1234L1Z5</div></td>
+                <td>07 Jul 2026</td>
+                <td>14</td>
+                <td>₹24,119</td>
+                <td>₹4,331</td>
+                <td class="font-bold">₹28,450</td>
+                <td><span class="pill pill-success">Paid</span></td>
+                <td><button class="icon-btn" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">INV-2025-0185</div></td>
+                <td><div class="cell-main">Suresh Kumar</div><div class="cell-sub">Walk-in customer</div></td>
+                <td>07 Jul 2026</td>
+                <td>3</td>
+                <td>₹3,564</td>
+                <td>₹636</td>
+                <td class="font-bold">₹4,200</td>
+                <td><span class="pill pill-success">Paid</span></td>
+                <td><button class="icon-btn" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">INV-2025-0184</div></td>
+                <td><div class="cell-main">Patel Electronics</div><div class="cell-sub">27AABCP9876R1Z2</div></td>
+                <td>06 Jul 2026</td>
+                <td>8</td>
+                <td>₹44,745</td>
+                <td>₹8,055</td>
+                <td class="font-bold">₹52,800</td>
+                <td><span class="pill pill-warning">Partial ₹20k</span></td>
+                <td><button class="icon-btn" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">INV-2025-0183</div></td>
+                <td><div class="cell-main">Anjali Sharma</div><div class="cell-sub">Walk-in customer</div></td>
+                <td>06 Jul 2026</td>
+                <td>2</td>
+                <td>₹1,602</td>
+                <td>₹288</td>
+                <td class="font-bold">₹1,890</td>
+                <td><span class="pill pill-success">Paid</span></td>
+                <td><button class="icon-btn" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">INV-2025-0182</div></td>
+                <td><div class="cell-main">Mumbai Trade House</div><div class="cell-sub">27AAACM4567P1Z7</div></td>
+                <td>05 Jul 2026</td>
+                <td>21</td>
+                <td>₹71,695</td>
+                <td>₹12,905</td>
+                <td class="font-bold">₹84,600</td>
+                <td><span class="pill pill-danger">Unpaid</span></td>
+                <td><button class="icon-btn" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">INV-2025-0181</div></td>
+                <td><div class="cell-main">Gupta General Store</div><div class="cell-sub">Walk-in customer</div></td>
+                <td>05 Jul 2026</td>
+                <td>5</td>
+                <td>₹9,322</td>
+                <td>₹1,678</td>
+                <td class="font-bold">₹11,000</td>
+                <td><span class="pill pill-success">Paid</span></td>
+                <td><button class="icon-btn" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">INV-2025-0180</div></td>
+                <td><div class="cell-main">Sharma Provision Store</div><div class="cell-sub">27AAACS5678T1Z9</div></td>
+                <td>04 Jul 2026</td>
+                <td>12</td>
+                <td>₹38,136</td>
+                <td>₹6,864</td>
+                <td class="font-bold">₹45,000</td>
+                <td><span class="pill pill-danger">Overdue</span></td>
+                <td><button class="icon-btn" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ ITEMS / INVENTORY ============ -->
+      <section class="page" id="page-items">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Items & Inventory</div>
+            <div class="page-subtitle">128 items · 7 low stock · Total stock value: ₹3,84,500</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Import
+            </button>
+            <button class="btn-new">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Item
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active">All (128)</button>
+          <button class="filter-chip">Electronics (54)</button>
+          <button class="filter-chip">Accessories (38)</button>
+          <button class="filter-chip">Appliances (22)</button>
+          <button class="filter-chip">Cables (14)</button>
+          <div style="flex:1;"></div>
+          <button class="filter-chip" style="color: var(--danger); border-color: var(--danger-light); background: var(--danger-light);">⚠ Low Stock (7)</button>
+        </div>
+
+        <div class="items-grid">
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">MP</div>
+              <span class="item-stock low">Low · 3</span>
+            </div>
+            <div class="item-name">Mi Power Bank 20000mAh</div>
+            <div class="item-meta">HSN: 8507 · GST 18% · Electronics</div>
+            <div class="item-price-row">
+              <div class="item-price">₹1,499</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">UC</div>
+              <span class="item-stock low">Low · 8</span>
+            </div>
+            <div class="item-name">USB-C Cable 1m (Braided)</div>
+            <div class="item-meta">HSN: 8544 · GST 18% · Cables</div>
+            <div class="item-price-row">
+              <div class="item-price">₹299</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">LB</div>
+              <span class="item-stock out">Out · 0</span>
+            </div>
+            <div class="item-name">LED Bulb 12W (Pack of 4)</div>
+            <div class="item-meta">HSN: 8539 · GST 12% · Appliances</div>
+            <div class="item-price-row">
+              <div class="item-price">₹449</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">HC</div>
+              <span class="item-stock low">Low · 5</span>
+            </div>
+            <div class="item-name">HDMI Cable 2m (Premium)</div>
+            <div class="item-meta">HSN: 8544 · GST 18% · Cables</div>
+            <div class="item-price-row">
+              <div class="item-price">₹549</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">BE</div>
+              <span class="item-stock low">Low · 2</span>
+            </div>
+            <div class="item-name">Bluetooth Earbuds Pro</div>
+            <div class="item-meta">HSN: 8518 · GST 18% · Electronics</div>
+            <div class="item-price-row">
+              <div class="item-price">₹2,499</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">PH</div>
+              <span class="item-stock ok">In Stock · 42</span>
+            </div>
+            <div class="item-name">Phone Holder (Car Mount)</div>
+            <div class="item-meta">HSN: 8479 · GST 18% · Accessories</div>
+            <div class="item-price-row">
+              <div class="item-price">₹399</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">WB</div>
+              <span class="item-stock ok">In Stock · 65</span>
+            </div>
+            <div class="item-name">Smart Watch Series 7</div>
+            <div class="item-meta">HSN: 8517 · GST 18% · Electronics</div>
+            <div class="item-price-row">
+              <div class="item-price">₹4,999</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+          <div class="item-card">
+            <div class="item-card-top">
+              <div class="item-thumb">ML</div>
+              <span class="item-stock ok">In Stock · 28</span>
+            </div>
+            <div class="item-name">Multi-Port USB Charger 65W</div>
+            <div class="item-meta">HSN: 8504 · GST 18% · Accessories</div>
+            <div class="item-price-row">
+              <div class="item-price">₹1,299</div>
+              <div class="text-xs text-muted">Sale price</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PARTIES ============ -->
+      <section class="page" id="page-parties">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Parties</div>
+            <div class="page-subtitle">Customers & Suppliers · 84 total</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-new">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Party
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active">All (84)</button>
+          <button class="filter-chip">Customers (62)</button>
+          <button class="filter-chip">Suppliers (22)</button>
+          <button class="filter-chip" style="color: var(--danger); border-color: var(--danger-light); background: var(--danger-light);">Receivables (24)</button>
+          <button class="filter-chip" style="color: var(--success); border-color: var(--success-light); background: var(--success-light);">Payables (8)</button>
+        </div>
+
+        <div class="grid-2 grid-2-even">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Customers — Receivables</div>
+              <a class="card-link">View all →</a>
+            </div>
+            <div>
+              <div class="party-row">
+                <div class="party-avatar">VT</div>
+                <div class="party-info">
+                  <div class="party-name">Verma Traders</div>
+                  <div class="party-sub">GSTIN: 27AAACV1234L1Z5 · Mumbai · 14 invoices</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount">₹0</div>
+                  <div class="party-amount-label">Cleared</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar">PE</div>
+                <div class="party-info">
+                  <div class="party-name">Patel Electronics</div>
+                  <div class="party-sub">GSTIN: 27AABCP9876R1Z2 · Pune · 22 invoices</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount due">₹32,800</div>
+                  <div class="party-amount-label">Receivable</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar">MT</div>
+                <div class="party-info">
+                  <div class="party-name">Mumbai Trade House</div>
+                  <div class="party-sub">GSTIN: 27AAACM4567P1Z7 · Mumbai · 38 invoices</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount due">₹84,600</div>
+                  <div class="party-amount-label">Receivable</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar">SP</div>
+                <div class="party-info">
+                  <div class="party-name">Sharma Provision Store</div>
+                  <div class="party-sub">GSTIN: 27AAACS5678T1Z9 · Thane · 7 invoices</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount due">₹45,000</div>
+                  <div class="party-amount-label">Overdue 3d</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar">SK</div>
+                <div class="party-info">
+                  <div class="party-name">Suresh Kumar</div>
+                  <div class="party-sub">Walk-in customer · 4 invoices</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount">₹0</div>
+                  <div class="party-amount-label">Cleared</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Suppliers — Payables</div>
+              <a class="card-link">View all →</a>
+            </div>
+            <div>
+              <div class="party-row">
+                <div class="party-avatar" style="background: var(--accent-light); color: var(--accent);">DI</div>
+                <div class="party-info">
+                  <div class="party-name">Distributor India Pvt Ltd</div>
+                  <div class="party-sub">GSTIN: 27AAACD6789Q1Z3 · Mumbai · 18 bills</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount" style="color: var(--danger);">₹1,20,000</div>
+                  <div class="party-amount-label">Payable</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar" style="background: var(--accent-light); color: var(--accent);">MS</div>
+                <div class="party-info">
+                  <div class="party-name">MobileSource Wholesale</div>
+                  <div class="party-sub">GSTIN: 27AAACM9999R1Z8 · Delhi · 11 bills</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount" style="color: var(--danger);">₹48,500</div>
+                  <div class="party-amount-label">Payable</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar" style="background: var(--accent-light); color: var(--accent);">TG</div>
+                <div class="party-info">
+                  <div class="party-name">TechGoods Distributors</div>
+                  <div class="party-sub">GSTIN: 27AAACT1111S1Z4 · Pune · 9 bills</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount credit">₹0</div>
+                  <div class="party-amount-label">Cleared</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar" style="background: var(--accent-light); color: var(--accent);">EK</div>
+                <div class="party-info">
+                  <div class="party-name">E-Kart Suppliers</div>
+                  <div class="party-sub">GSTIN: 27AAACE2222T1Z6 · Nashik · 6 bills</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount" style="color: var(--danger);">₹18,200</div>
+                  <div class="party-amount-label">Payable</div>
+                </div>
+              </div>
+              <div class="party-row">
+                <div class="party-avatar" style="background: var(--accent-light); color: var(--accent);">VS</div>
+                <div class="party-info">
+                  <div class="party-name">Vijay Sales Wholesale</div>
+                  <div class="party-sub">GSTIN: 27AAACV3333U1Z1 · Mumbai · 14 bills</div>
+                </div>
+                <div class="party-balance">
+                  <div class="party-amount credit">₹0</div>
+                  <div class="party-amount-label">Cleared</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PURCHASE ============ -->
+      <section class="page" id="page-purchase">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Purchase Bills</div>
+            <div class="page-subtitle">42 bills this month · ₹2,84,500 total purchases</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+            <button class="btn-new">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Purchase Bill
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active">All (42)</button>
+          <button class="filter-chip">Paid (28)</button>
+          <button class="filter-chip">Unpaid (10)</button>
+          <button class="filter-chip">Returns (4)</button>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Bill No.</th>
+                <th>Supplier</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Taxable</th>
+                <th>GST (ITC)</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="cell-main">PUR-2025-0042</div></td>
+                <td><div class="cell-main">Distributor India Pvt Ltd</div></td>
+                <td>06 Jul 2026</td>
+                <td>24</td>
+                <td>₹68,644</td>
+                <td>₹12,356</td>
+                <td class="font-bold">₹81,000</td>
+                <td><span class="pill pill-warning">Unpaid</span></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">PUR-2025-0041</div></td>
+                <td><div class="cell-main">MobileSource Wholesale</div></td>
+                <td>05 Jul 2026</td>
+                <td>15</td>
+                <td>₹38,136</td>
+                <td>₹6,864</td>
+                <td class="font-bold">₹45,000</td>
+                <td><span class="pill pill-success">Paid</span></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">PUR-2025-0040</div></td>
+                <td><div class="cell-main">E-Kart Suppliers</div></td>
+                <td>04 Jul 2026</td>
+                <td>8</td>
+                <td>₹15,254</td>
+                <td>₹2,746</td>
+                <td class="font-bold">₹18,000</td>
+                <td><span class="pill pill-success">Paid</span></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">PUR-2025-0039</div></td>
+                <td><div class="cell-main">Vijay Sales Wholesale</div></td>
+                <td>03 Jul 2026</td>
+                <td>32</td>
+                <td>₹84,745</td>
+                <td>₹15,255</td>
+                <td class="font-bold">₹1,00,000</td>
+                <td><span class="pill pill-success">Paid</span></td>
+              </tr>
+              <tr>
+                <td><div class="cell-main">PUR-2025-0038</div></td>
+                <td><div class="cell-main">TechGoods Distributors</div></td>
+                <td>02 Jul 2026</td>
+                <td>11</td>
+                <td>₹21,186</td>
+                <td>₹3,814</td>
+                <td class="font-bold">₹25,000</td>
+                <td><span class="pill pill-danger">Overdue</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ REPORTS ============ -->
+      <section class="page" id="page-reports">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Reports & Analytics</div>
+            <div class="page-subtitle">1 Jul – 7 Jul 2026 · This financial year Q1</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+              Last 7 days
+            </button>
+            <button class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              GSTR-1 Export
+            </button>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Total Sales</div><div class="kpi-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div>
+            <div class="kpi-value">₹4,82,350</div>
+            <div class="kpi-trend up">▲ 18.2% vs last week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">Total Purchases</div><div class="kpi-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div></div>
+            <div class="kpi-value">₹2,84,500</div>
+            <div class="kpi-trend up">▲ 9.5%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">GST Collected</div><div class="kpi-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div>
+            <div class="kpi-value">₹86,823</div>
+            <div class="kpi-trend up">Output Tax</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><div class="kpi-label">GST Payable (ITC)</div><div class="kpi-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div></div>
+            <div class="kpi-value">₹51,210</div>
+            <div class="kpi-trend down">Net: ₹35,613</div>
+          </div>
+        </div>
+
+        <div class="report-grid">
+          <div class="card chart-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div class="card-title">Daily Sales — Last 7 Days</div>
+              <span class="pill pill-primary">₹4,82,350 total</span>
+            </div>
+            <div class="chart-bars">
+              <div class="chart-bar-group">
+                <div class="chart-bar-value">₹42k</div>
+                <div class="chart-bar" style="height: 35%;"></div>
+                <div class="chart-bar-label">Mon</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar-value">₹68k</div>
+                <div class="chart-bar" style="height: 56%;"></div>
+                <div class="chart-bar-label">Tue</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar-value">₹54k</div>
+                <div class="chart-bar" style="height: 45%;"></div>
+                <div class="chart-bar-label">Wed</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar-value">₹92k</div>
+                <div class="chart-bar" style="height: 78%;"></div>
+                <div class="chart-bar-label">Thu</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar-value">₹1.1L</div>
+                <div class="chart-bar" style="height: 95%;"></div>
+                <div class="chart-bar-label">Fri</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar-value">₹78k</div>
+                <div class="chart-bar" style="height: 65%;"></div>
+                <div class="chart-bar-label">Sat</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bar-value">₹42k</div>
+                <div class="chart-bar" style="height: 35%; background: linear-gradient(180deg, var(--accent), #D97706);"></div>
+                <div class="chart-bar-label" style="color: var(--accent); font-weight: 700;">Today</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="card-title" style="margin-bottom: 14px;">GST Summary (GSTR-1 Ready)</div>
+            <div class="gst-breakdown">
+              <div class="gst-row">
+                <span class="gst-label">Taxable Supplies</span>
+                <span class="gst-value">₹4,09,194</span>
+              </div>
+              <div class="gst-row">
+                <span class="gst-label">Zero-rated (0%)</span>
+                <span class="gst-value">₹12,400</span>
+              </div>
+              <div class="gst-row">
+                <span class="gst-label">GST 5% Supplies</span>
+                <span class="gst-value">₹38,200</span>
+              </div>
+              <div class="gst-row">
+                <span class="gst-label">GST 12% Supplies</span>
+                <span class="gst-value">₹62,800</span>
+              </div>
+              <div class="gst-row">
+                <span class="gst-label">GST 18% Supplies</span>
+                <span class="gst-value">₹2,84,500</span>
+              </div>
+              <div class="gst-row" style="background: var(--primary-soft);">
+                <span class="gst-label" style="font-weight: 600; color: var(--primary-dark);">Total Output GST</span>
+                <span class="gst-value" style="color: var(--primary-dark);">₹86,823</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Top Selling Items</div>
+            <a class="card-link">View full report →</a>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Item</th><th>HSN</th><th>Qty Sold</th><th>Revenue</th><th>% of Sales</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><div class="cell-main">Smart Watch Series 7</div></td><td>8517</td><td>48</td><td class="font-bold">₹2,39,952</td><td>49.7%</td></tr>
+              <tr><td><div class="cell-main">Bluetooth Earbuds Pro</div></td><td>8518</td><td>32</td><td class="font-bold">₹79,968</td><td>16.6%</td></tr>
+              <tr><td><div class="cell-main">Mi Power Bank 20000mAh</div></td><td>8507</td><td>28</td><td class="font-bold">₹41,972</td><td>8.7%</td></tr>
+              <tr><td><div class="cell-main">Multi-Port USB Charger 65W</div></td><td>8504</td><td>22</td><td class="font-bold">₹28,578</td><td>5.9%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ SETTINGS ============ -->
+      <section class="page" id="page-settings">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Settings</div>
+            <div class="page-subtitle">Manage your business profile, GST & subscription</div>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="settings-nav">
+            <button class="settings-nav-item active">Business Profile</button>
+            <button class="settings-nav-item">GST Settings</button>
+            <button class="settings-nav-item">Invoice Templates</button>
+            <button class="settings-nav-item">Users & Roles</button>
+            <button class="settings-nav-item">Subscription & Billing</button>
+            <button class="settings-nav-item">Notifications</button>
+            <button class="settings-nav-item">Data & Backup</button>
+          </div>
+
+          <div>
+            <div class="card">
+              <div class="settings-section">
+                <h3>Business Profile</h3>
+                <p class="desc">This information appears on every invoice you generate.</p>
+
+                <div class="form-row">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Business Name</label>
+                    <input class="form-input" value="Sharma Electronics" />
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Legal Name</label>
+                    <input class="form-input" value="Sharma Electronics Pvt Ltd" />
+                  </div>
+                </div>
+
+                <div class="form-row" style="margin-top: 14px;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">GSTIN</label>
+                    <input class="form-input" value="27ABCDE1234F1Z5" />
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">PAN</label>
+                    <input class="form-input" value="ABCDE1234F" />
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                  <label class="form-label">Business Address</label>
+                  <textarea class="form-input" rows="2" style="resize: vertical;">Shop No. 14, Hill Road, Bandra West, Mumbai, Maharashtra - 400050</textarea>
+                </div>
+
+                <div class="form-row" style="margin-top: 14px;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Phone</label>
+                    <input class="form-input" value="+91 98200 12345" />
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Email</label>
+                    <input class="form-input" value="rahul@sharma-electronics.in" />
+                  </div>
+                </div>
+
+                <div class="form-row" style="margin-top: 14px;">
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">State</label>
+                    <select class="form-input"><option selected>Maharashtra (27)</option></select>
+                  </div>
+                  <div class="form-group" style="margin: 0;">
+                    <label class="form-label">Default GST Type</label>
+                    <select class="form-input"><option>Intra-state (CGST + SGST)</option></select>
+                  </div>
+                </div>
+
+                <button class="btn-primary" style="width: auto; padding: 10px 18px; margin-top: 18px;">Save Changes</button>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 16px;">
+              <div class="settings-section">
+                <h3>Subscription & Billing</h3>
+                <p class="desc">Manage your SaaS plan. Layer A — platform billing.</p>
+
+                <div class="plan-card current">
+                  <div>
+                    <div class="plan-name">Pro Plan <span class="pill pill-primary" style="margin-left: 6px;">Current</span></div>
+                    <div class="plan-price">₹999<span>/month</span></div>
+                    <div class="plan-features">Unlimited invoices · 5 users · e-Invoice · WhatsApp · Multi-branch</div>
+                  </div>
+                  <button class="btn-secondary">Manage</button>
+                </div>
+                <div class="plan-card">
+                  <div>
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">₹499<span>/month</span></div>
+                    <div class="plan-features">500 invoices · 2 users · Inventory · Reports</div>
+                  </div>
+                  <button class="btn-secondary">Downgrade</button>
+                </div>
+                <div class="plan-card">
+                  <div>
+                    <div class="plan-name">Enterprise</div>
+                    <div class="plan-price">₹2,499<span>/month</span></div>
+                    <div class="plan-features">Unlimited everything · API access · Custom branding · Priority support</div>
+                  </div>
+                  <button class="btn-secondary">Upgrade</button>
+                </div>
+
+                <div style="margin-top: 16px; padding: 14px; background: var(--warning-light); border-radius: 8px; display: flex; gap: 12px; align-items: center;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <div style="flex:1;">
+                    <div style="font-weight: 600; font-size: 13px;">Trial ends in 11 days</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Add a payment method to continue after trial. Powered by Razorpay.</div>
+                  </div>
+                  <button class="btn-primary" style="width:auto; padding: 8px 14px;">Add Payment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  function switchLoginTab(btn, type) {
+    document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('login-fields').classList.toggle('hidden', type !== 'login');
+    document.getElementById('signup-fields').classList.toggle('hidden', type !== 'signup');
+  }
+
+  function enterApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('active');
+  }
+
+  function exitApp() {
+    document.getElementById('app').classList.remove('active');
+    document.getElementById('login-screen').style.display = 'grid';
+    // Reset to dashboard
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+    switchPage('dashboard', document.querySelectorAll('.nav-item')[0]);
+  }
+
+  function switchPage(pageId, navBtn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+    if (navBtn) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      navBtn.classList.add('active');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
