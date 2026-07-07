@@ -123,17 +123,31 @@ fi
 
 echo ""
 echo -e "${GREEN}=== Step 4/7: Prisma + DB setup ===${NC}"
+
+# Prisma CLI reads from .env (not .env.production). Create a symlink.
+# This way both Prisma and Next.js can read env vars.
+if [[ ! -f ".env" ]]; then
+    ln -s .env.production .env
+    echo -e "${GREEN}✓ Created .env symlink → .env.production${NC}"
+fi
+
+# Load env vars into current shell (for npx prisma to use)
+set -a
+source .env.production
+set +a
+
+echo -e "${YELLOW}🔧 Generating Prisma client...${NC}"
 npx prisma generate
+
+echo -e "${YELLOW}💾 Pushing schema to DB...${NC}"
 npx prisma db push
 
 # First-time seed
 if [[ ! -f db/production.db ]] || [[ $(sqlite3 db/production.db "SELECT COUNT(*) FROM Tenant;" 2>/dev/null || echo 0) -eq 0 ]]; then
     echo -e "${YELLOW}🌱 First deploy — seeding database...${NC}"
     # Install tsx if not present
-    npx tsx scripts/seed.ts 2>/dev/null || {
-        npm install -D tsx
-        npx tsx scripts/seed.ts
-    }
+    npm install -D tsx 2>/dev/null
+    DATABASE_URL="file:$(pwd)/db/production.db" npx tsx scripts/seed.ts
 fi
 
 echo ""
@@ -143,7 +157,8 @@ npm run build
 # Copy standalone + static + public
 cp -r .next/static .next/standalone/.next/
 cp -r public .next/standalone/ 2>/dev/null || mkdir -p .next/standalone/public
-cp .env.production .next/standalone/
+cp .env.production .next/standalone/.env.production
+cp .env.production .next/standalone/.env
 
 # ============================================
 # 5. Restart PM2
