@@ -3,7 +3,7 @@
  * cleanup-demo-data.ts
  * ============================================
  * Removes ALL demo data but keeps:
- *   - Super admin (admin@billdesk.pro) — so you can still login
+ *   - Super admin (admin@wifiwalanet.in) — so you can still login
  *   - Plans (Free, Starter, Pro, Enterprise) — needed for subscription system
  *   - Super admin's user record
  *
@@ -136,13 +136,13 @@ async function main() {
     const passwordHash = await bcrypt.hash('admin123', 10)
     await db.user.create({
       data: {
-        email: 'admin@billdesk.pro',
+        email: 'admin@wifiwalanet.in',
         name: 'Platform Admin',
         passwordHash,
         role: 'super_admin',
       },
     })
-    console.log('   ✓ Created super admin: admin@billdesk.pro / admin123')
+    console.log('   ✓ Created super admin: admin@wifiwalanet.in / admin123')
     console.log('   ⚠️  CHANGE THIS PASSWORD IMMEDIATELY after first login!')
   }
 
@@ -172,12 +172,12 @@ async function main() {
   console.log('')
   if (keepAdmin) {
     console.log('🔐 You can still login as:')
-    console.log('   👑 admin@billdesk.pro / admin123 (or your custom password)')
+    console.log('   👑 admin@wifiwalanet.in / admin123 (or your custom password)')
     console.log('')
     console.log('🆕 New tenants will sign up via the registration form.')
   } else {
     console.log('🔐 Fresh super admin created:')
-    console.log('   👑 admin@billdesk.pro / admin123')
+    console.log('   👑 admin@wifiwalanet.in / admin123')
     console.log('   ⚠️  Change password immediately!')
   }
 }

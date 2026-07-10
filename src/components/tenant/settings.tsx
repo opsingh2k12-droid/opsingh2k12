@@ -6,13 +6,14 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useAppTheme, THEMES } from "@/lib/theme-context"
-import { Building2, CreditCard, Palette, Bell, Database, Check } from "lucide-react"
+import { Building2, CreditCard, Palette, Bell, Database, Check, Lock } from "lucide-react"
 import { useState } from "react"
 import { formatINR, formatDate } from "@/lib/format"
 import { toast } from "sonner"
+import { ChangePasswordCard } from "@/components/change-password-card"
 
 export function TenantSettings({ tenant }: { tenant: any }) {
-  const [tab, setTab] = useState<"profile" | "subscription" | "appearance">("profile")
+  const [tab, setTab] = useState<"profile" | "subscription" | "appearance" | "security">("profile")
   const { theme, setTheme } = useAppTheme()
   const sub = tenant.subscriptions?.[0]
   const plan = sub?.plan
@@ -30,6 +31,7 @@ export function TenantSettings({ tenant }: { tenant: any }) {
           <SettingsTab active={tab === "profile"} onClick={() => setTab("profile")} icon={<Building2 className="w-4 h-4" />}>Business Profile</SettingsTab>
           <SettingsTab active={tab === "subscription"} onClick={() => setTab("subscription")} icon={<CreditCard className="w-4 h-4" />}>Subscription</SettingsTab>
           <SettingsTab active={tab === "appearance"} onClick={() => setTab("appearance")} icon={<Palette className="w-4 h-4" />}>Appearance & Theme</SettingsTab>
+          <SettingsTab active={tab === "security"} onClick={() => setTab("security")} icon={<Lock className="w-4 h-4" />}>Security</SettingsTab>
         </div>
 
         <div>
@@ -171,6 +173,18 @@ export function TenantSettings({ tenant }: { tenant: any }) {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {tab === "security" && (
+            <div className="space-y-4">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-base mb-1">Account Security</h3>
+                  <p className="text-xs text-muted-foreground">Manage your login credentials and keep your account secure.</p>
+                </CardContent>
+              </Card>
+              <ChangePasswordCard />
+            </div>
           )}
         </div>
       </div>

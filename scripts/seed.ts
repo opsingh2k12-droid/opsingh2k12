@@ -55,7 +55,7 @@ async function main() {
   // ============ SUPER ADMIN ============
   const superAdminHash = await bcrypt.hash('admin123', 10)
   const superAdmin = await db.user.create({
-    data: { email: 'admin@billdesk.pro', name: 'Platform Admin', passwordHash: superAdminHash, role: 'super_admin' },
+    data: { email: 'admin@wifiwalanet.in', name: 'Platform Admin', passwordHash: superAdminHash, role: 'super_admin' },
   })
   console.log('✓ Super admin:', superAdmin.email)
 
@@ -245,7 +245,7 @@ async function main() {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('🔑 Login credentials:')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.log('Super Admin:   admin@billdesk.pro / admin123')
+  console.log('Super Admin:   admin@wifiwalanet.in / admin123')
   console.log('Tenant (Pro):  rahul@sharma-electronics.in / rahul123')
   console.log('Tenant (Starter): verma@traders.in / verma123')
   console.log('Tenant (Trial): gupta@store.in / gupta123')

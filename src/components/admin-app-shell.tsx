@@ -12,6 +12,7 @@ import { AdminDashboard } from "@/components/admin/dashboard"
 import { AdminTenants } from "@/components/admin/tenants"
 import { AdminRevenue } from "@/components/admin/revenue"
 import { AdminPlans } from "@/components/admin/plans"
+import { AdminSettings } from "@/components/admin/settings"
 import { useAppTheme, THEMES, ThemeName } from "@/lib/theme-context"
 
 export type AdminPage = "dashboard" | "tenants" | "revenue" | "plans" | "settings"
@@ -21,6 +22,7 @@ const navItems: { id: AdminPage; label: string; icon: React.ReactNode }[] = [
   { id: "tenants", label: "Tenants", icon: <Building2 className="w-4 h-4" /> },
   { id: "revenue", label: "Revenue & Payments", icon: <CreditCard className="w-4 h-4" /> },
   { id: "plans", label: "Plans", icon: <BarChart3 className="w-4 h-4" /> },
+  { id: "settings", label: "Settings", icon: <Settings className="w-4 h-4" /> },
 ]
 
 export function AdminAppShell() {
@@ -175,11 +177,7 @@ export function AdminAppShell() {
           {page === "tenants" && <AdminTenants />}
           {page === "revenue" && <AdminRevenue />}
           {page === "plans" && <AdminPlans />}
-          {page === "settings" && (
-            <div className="flex items-center justify-center h-96 text-muted-foreground">
-              Platform settings coming soon
-            </div>
-          )}
+          {page === "settings" && <AdminSettings />}
         </main>
       </div>
     </div>
