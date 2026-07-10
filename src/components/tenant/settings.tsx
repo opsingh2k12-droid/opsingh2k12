@@ -9,16 +9,17 @@ import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useAppTheme, THEMES } from "@/lib/theme-context"
-import { Building2, CreditCard, Palette, Bell, Database, Check, Lock, FileText, ImageIcon } from "lucide-react"
+import { Building2, CreditCard, Palette, Bell, Database, Check, Lock, FileText, ImageIcon, LayoutTemplate } from "lucide-react"
 import { useState } from "react"
 import { formatINR, formatDate } from "@/lib/format"
 import { toast } from "sonner"
 import { ChangePasswordCard } from "@/components/change-password-card"
 import { FileUpload } from "@/components/file-upload"
+import { INVOICE_TEMPLATES, InvoiceTemplate } from "@/components/tenant/invoice-templates"
 
 export function TenantSettings({ tenant: initialTenant }: { tenant: any }) {
   const queryClient = useQueryClient()
-  const [tab, setTab] = useState<"profile" | "invoice-settings" | "subscription" | "appearance" | "security">("profile")
+  const [tab, setTab] = useState<"profile" | "invoice-settings" | "invoice-template" | "subscription" | "appearance" | "security">("profile")
   const { theme, setTheme } = useAppTheme()
   const sub = initialTenant.subscriptions?.[0]
   const plan = sub?.plan
@@ -77,6 +78,7 @@ export function TenantSettings({ tenant: initialTenant }: { tenant: any }) {
         <div className="flex flex-row lg:flex-col gap-1 overflow-x-auto">
           <SettingsTab active={tab === "profile"} onClick={() => setTab("profile")} icon={<Building2 className="w-4 h-4" />}>Business Profile</SettingsTab>
           <SettingsTab active={tab === "invoice-settings"} onClick={() => setTab("invoice-settings")} icon={<FileText className="w-4 h-4" />}>Invoice Settings</SettingsTab>
+          <SettingsTab active={tab === "invoice-template"} onClick={() => setTab("invoice-template")} icon={<LayoutTemplate className="w-4 h-4" />}>Invoice Template</SettingsTab>
           <SettingsTab active={tab === "subscription"} onClick={() => setTab("subscription")} icon={<CreditCard className="w-4 h-4" />}>Subscription</SettingsTab>
           <SettingsTab active={tab === "appearance"} onClick={() => setTab("appearance")} icon={<Palette className="w-4 h-4" />}>Appearance & Theme</SettingsTab>
           <SettingsTab active={tab === "security"} onClick={() => setTab("security")} icon={<Lock className="w-4 h-4" />}>Security</SettingsTab>
@@ -233,8 +235,151 @@ export function TenantSettings({ tenant: initialTenant }: { tenant: any }) {
                   previewClass="w-40 h-20"
                 />
 
+                <Separator />
+
+                {/* Bank Details */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Bank Details (shown on invoice)</h4>
+                  <p className="text-xs text-muted-foreground mb-3">Customers can use these details to make payments.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs">Bank Name</Label>
+                      <Input value={form.bankName || ""} onChange={(e) => setForm({ ...form, bankName: e.target.value })} placeholder="e.g. State Bank of India" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Account Holder Name</Label>
+                      <Input value={form.bankAccountName || ""} onChange={(e) => setForm({ ...form, bankAccountName: e.target.value })} placeholder="e.g. Sharma Electronics" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Account Number</Label>
+                      <Input value={form.bankAccountNumber || ""} onChange={(e) => setForm({ ...form, bankAccountNumber: e.target.value })} placeholder="0000000000000" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">IFSC Code</Label>
+                      <Input value={form.bankIfsc || ""} onChange={(e) => setForm({ ...form, bankIfsc: e.target.value })} placeholder="e.g. SBIN0001234" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Branch</Label>
+                      <Input value={form.bankBranch || ""} onChange={(e) => setForm({ ...form, bankBranch: e.target.value })} placeholder="e.g. Bandra West" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">UPI ID (optional)</Label>
+                      <Input value={form.bankUpi || ""} onChange={(e) => setForm({ ...form, bankUpi: e.target.value })} placeholder="e.g. sharma@upi" className="mt-1" />
+                    </div>
+                  </div>
+                </div>
+
                 <Button onClick={handleSave} disabled={saveMutation.isPending}>
                   {saveMutation.isPending ? "Saving..." : "Save Invoice Settings"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ============ INVOICE TEMPLATE ============ */}
+          {tab === "invoice-template" && (
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <div>
+                  <h3 className="font-semibold text-base">Invoice Template</h3>
+                  <p className="text-xs text-muted-foreground">Choose how your invoices and estimates look. Preview updates instantly.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {INVOICE_TEMPLATES.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setForm({ ...form, invoiceTemplate: t.id })}
+                      className={`border-2 rounded-lg p-3 text-left transition-all hover:border-foreground/30 ${(form.invoiceTemplate || "modern") === t.id ? "border-primary bg-primary/5" : "border-border"}`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold">{t.name}</span>
+                        {(form.invoiceTemplate || "modern") === t.id && <Check className="w-4 h-4 text-primary" />}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mb-2">{t.description}</p>
+                      {/* Mini preview */}
+                      <div className="border rounded bg-white p-1.5 text-[6px] leading-tight">
+                        <div className="flex justify-between mb-1">
+                          <div className="font-bold">{t.name}</div>
+                          <div className="text-primary font-bold">INV</div>
+                        </div>
+                        <div className="space-y-0.5">
+                          <div className="h-1 bg-muted rounded" style={{ width: "100%" }} />
+                          <div className="h-1 bg-muted rounded" style={{ width: "80%" }} />
+                          <div className="h-1 bg-muted rounded" style={{ width: "60%" }} />
+                        </div>
+                        <div className="flex justify-between mt-1 pt-1 border-t">
+                          <span>Total</span>
+                          <span className="font-bold text-primary">₹1,000</span>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <Separator />
+
+                {/* Live preview */}
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Live Preview</h4>
+                  <div className="border rounded-lg overflow-hidden bg-white">
+                    <InvoiceTemplate
+                      template={form.invoiceTemplate || "modern"}
+                      invoice={{
+                        invoiceNumber: "INV-2026-0001",
+                        invoiceDate: new Date(),
+                        supplyType: "intra",
+                        type: "invoice",
+                        status: "unpaid",
+                        subtotal: 1000,
+                        discountPct: 0,
+                        discountAmount: 0,
+                        taxableAmount: 1000,
+                        cgst: 90,
+                        sgst: 90,
+                        igst: 0,
+                        totalGst: 180,
+                        grandTotal: 1180,
+                        paidAmount: 0,
+                        balanceDue: 1180,
+                        notes: "Thank you for your business.",
+                        terms: "Payment due within 15 days.",
+                        items: [
+                          { id: "1", name: "Sample Item", hsn: "8517", qty: 1, rate: 1000, gstRate: 18, gstType: "exclusive", amount: 1000 },
+                        ],
+                      }}
+                      tenant={{
+                        businessName: form.businessName || "Your Business",
+                        legalName: form.legalName,
+                        gstin: form.gstin,
+                        address: form.address,
+                        city: form.city,
+                        state: form.state,
+                        phone: form.phone,
+                        email: form.email,
+                        logo: form.logo,
+                        signature: form.signature,
+                        bankName: form.bankName,
+                        bankAccountName: form.bankAccountName,
+                        bankAccountNumber: form.bankAccountNumber,
+                        bankIfsc: form.bankIfsc,
+                        bankBranch: form.bankBranch,
+                        bankUpi: form.bankUpi,
+                      }}
+                      party={{
+                        name: "Sample Customer",
+                        address: "123 Sample Street",
+                        city: "Mumbai",
+                        state: "Maharashtra",
+                        phone: "+91 98765 43210",
+                        gstin: "27ABCDE1234F1Z5",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <Button onClick={handleSave} disabled={saveMutation.isPending}>
+                  {saveMutation.isPending ? "Saving..." : "Save Template Choice"}
                 </Button>
               </CardContent>
             </Card>

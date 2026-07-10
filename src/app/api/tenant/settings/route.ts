@@ -27,6 +27,13 @@ export async function GET() {
       invoicePrefix: true,
       estimatePrefix: true,
       fiscalYearStartMonth: true,
+      invoiceTemplate: true,
+      bankName: true,
+      bankAccountName: true,
+      bankAccountNumber: true,
+      bankIfsc: true,
+      bankBranch: true,
+      bankUpi: true,
     },
   })
   return NextResponse.json({ tenant })
@@ -57,6 +64,13 @@ export async function PUT(req: NextRequest) {
       invoicePrefix,
       estimatePrefix,
       fiscalYearStartMonth,
+      invoiceTemplate,
+      bankName,
+      bankAccountName,
+      bankAccountNumber,
+      bankIfsc,
+      bankBranch,
+      bankUpi,
     } = body
 
     const tenant = await db.tenant.update({
@@ -78,6 +92,13 @@ export async function PUT(req: NextRequest) {
         invoicePrefix,
         estimatePrefix,
         fiscalYearStartMonth: fiscalYearStartMonth ? Number(fiscalYearStartMonth) : undefined,
+        invoiceTemplate,
+        bankName,
+        bankAccountName,
+        bankAccountNumber,
+        bankIfsc,
+        bankBranch,
+        bankUpi,
       },
     })
 

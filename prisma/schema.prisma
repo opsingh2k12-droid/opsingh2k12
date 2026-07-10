@@ -34,6 +34,15 @@ model Tenant {
   invoicePrefix String   @default("INV-") // e.g. INV-2026-0001
   estimatePrefix String  @default("EST-") // e.g. EST-2026-0001
   fiscalYearStartMonth Int @default(4) // 1-12, default April (Indian FY)
+  // Invoice template
+  invoiceTemplate String  @default("modern") // modern | classic | professional | compact | colorful
+  // Bank details (shown on invoice)
+  bankName           String?
+  bankAccountName    String?
+  bankAccountNumber  String?
+  bankIfsc           String?
+  bankBranch         String?
+  bankUpi            String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
