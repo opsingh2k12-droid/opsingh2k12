@@ -7,15 +7,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { Loader2, Receipt, Boxes, BarChart3, MessageCircle } from "lucide-react"
+import { INDIAN_STATES } from "@/lib/indian-states"
 
 export function LoginScreen() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [signupLoading, setSignupLoading] = useState(false)
   const [loginData, setLoginData] = useState({ email: "", password: "" })
-  const [signupData, setSignupData] = useState({ businessName: "", email: "", password: "", phone: "", gstin: "", city: "", state: "Maharashtra", stateCode: "27" })
+  const [signupData, setSignupData] = useState({ businessName: "", email: "", password: "", phone: "", gstin: "", city: "", state: "", stateCode: "" })
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -170,8 +172,23 @@ export function LoginScreen() {
                         <Input id="city" value={signupData.city} onChange={(e) => setSignupData({ ...signupData, city: e.target.value })} placeholder="Mumbai" className="mt-1" />
                       </div>
                       <div>
-                        <Label htmlFor="stateCode">State Code</Label>
-                        <Input id="stateCode" value={signupData.stateCode} onChange={(e) => setSignupData({ ...signupData, stateCode: e.target.value })} placeholder="27" className="mt-1" />
+                        <Label htmlFor="state">State</Label>
+                        <Select
+                          value={signupData.stateCode}
+                          onValueChange={(v) => {
+                            const stateName = INDIAN_STATES.find((s) => s.code === v)?.name || ""
+                            setSignupData({ ...signupData, stateCode: v, state: stateName })
+                          }}
+                        >
+                          <SelectTrigger className="mt-1"><SelectValue placeholder="Select state..." /></SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {INDIAN_STATES.map((s) => (
+                              <SelectItem key={s.code} value={s.code}>
+                                {s.code} - {s.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                     <div>
