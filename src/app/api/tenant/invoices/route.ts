@@ -64,10 +64,14 @@ export async function POST(req: NextRequest) {
   const igst = isInter ? totalGst : 0
   const grandTotal = taxableAmount + totalGst
 
-  // Generate invoice number: INV-YYYY-XXXX
+  // Generate invoice/estimate number with tenant's custom prefix
   const year = new Date().getFullYear()
-  const count = await db.invoice.count({ where: { tenantId: ctx.tenantId } })
-  const invoiceNumber = `INV-${year}-${String(count + 1).padStart(4, "0")}`
+  const docType = body.type === "estimate" ? "estimate" : "invoice"
+  const tenant = await db.tenant.findUnique({ where: { id: ctx.tenantId }, select: { invoicePrefix: true, estimatePrefix: true } })
+  const prefix = docType === "estimate" ? (tenant?.estimatePrefix || "EST-") : (tenant?.invoicePrefix || "INV-")
+  // Count only docs of same type for sequential numbering
+  const count = await db.invoice.count({ where: { tenantId: ctx.tenantId, type: docType } })
+  const invoiceNumber = `${prefix}${year}-${String(count + 1).padStart(4, "0")}`
 
   const invoice = await db.invoice.create({
     data: {
@@ -76,6 +80,7 @@ export async function POST(req: NextRequest) {
       partyId,
       invoiceDate: invoiceDate ? new Date(invoiceDate) : new Date(),
       supplyType,
+      type: docType,
       status: status || "unpaid",
       subtotal,
       discountPct: discount,

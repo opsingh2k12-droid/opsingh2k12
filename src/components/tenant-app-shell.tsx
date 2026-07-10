@@ -4,7 +4,6 @@ import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Receipt, LayoutDashboard, FileText, Plus, Boxes, Users, ShoppingCart, BarChart3, Settings, LogOut, Search, Bell, Menu, Palette } from "lucide-react"
@@ -18,12 +17,13 @@ import { TenantReports } from "@/components/tenant/reports"
 import { TenantSettings } from "@/components/tenant/settings"
 import { useAppTheme, THEMES, ThemeName } from "@/lib/theme-context"
 
-export type TenantPage = "dashboard" | "items" | "parties" | "create-invoice" | "invoices" | "purchases" | "reports" | "settings"
+export type TenantPage = "dashboard" | "items" | "parties" | "create-invoice" | "create-estimate" | "invoices" | "purchases" | "reports" | "settings"
 
 const navItems: { id: TenantPage; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
   { id: "invoices", label: "Sales / Invoices", icon: <FileText className="w-4 h-4" /> },
   { id: "create-invoice", label: "New Invoice", icon: <Plus className="w-4 h-4" /> },
+  { id: "create-estimate", label: "New Estimate", icon: <FileText className="w-4 h-4" /> },
   { id: "items", label: "Items / Inventory", icon: <Boxes className="w-4 h-4" /> },
   { id: "parties", label: "Parties", icon: <Users className="w-4 h-4" /> },
   { id: "purchases", label: "Purchase", icon: <ShoppingCart className="w-4 h-4" /> },
@@ -79,7 +79,6 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
           >
             {item.icon}
             {item.label}
-            {item.id === "invoices" && <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1.5">3</Badge>}
           </button>
         ))}
 
@@ -187,6 +186,7 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
           {page === "items" && <TenantItems />}
           {page === "parties" && <TenantParties />}
           {page === "create-invoice" && <CreateInvoice onDone={() => navigate("invoices")} />}
+          {page === "create-estimate" && <CreateInvoice onDone={() => navigate("invoices")} docType="estimate" />}
           {page === "invoices" && <InvoicesList onNew={() => navigate("create-invoice")} />}
           {page === "purchases" && <PurchasesList />}
           {page === "reports" && <TenantReports />}

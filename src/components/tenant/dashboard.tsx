@@ -29,10 +29,10 @@ export function TenantDashboard({ onNavigate }: { onNavigate: (p: TenantPage) =>
   }
 
   const kpis = [
-    { label: "Today's Sales", value: formatINR(data?.todaySales || 0), icon: <IndianRupee className="w-4 h-4" />, trend: "+12.4%", trendUp: true, color: "primary" },
-    { label: "Pending Dues", value: formatINR(data?.pendingDues || 0), icon: <Clock className="w-4 h-4" />, trend: "-4.2%", trendUp: false, color: "destructive" },
-    { label: "Low Stock Items", value: `${data?.lowStockCount || 0} items`, icon: <AlertTriangle className="w-4 h-4" />, trend: "Needs restock", trendUp: false, color: "accent" },
-    { label: "Invoices This Month", value: `${data?.monthInvoices || 0}`, icon: <FileText className="w-4 h-4" />, trend: "+23 vs last month", trendUp: true, color: "primary" },
+    { label: "Today's Sales", value: formatINR(data?.todaySales || 0), icon: <IndianRupee className="w-4 h-4" />, trend: "", trendUp: true, color: "primary" },
+    { label: "Pending Dues", value: formatINR(data?.pendingDues || 0), icon: <Clock className="w-4 h-4" />, trend: "", trendUp: false, color: "destructive" },
+    { label: "Low Stock Items", value: `${data?.lowStockCount || 0} items`, icon: <AlertTriangle className="w-4 h-4" />, trend: data?.lowStockCount > 0 ? "Needs restock" : "All good", trendUp: false, color: "accent" },
+    { label: "Invoices This Month", value: `${data?.monthInvoices || 0}`, icon: <FileText className="w-4 h-4" />, trend: "", trendUp: true, color: "primary" },
   ]
 
   return (
@@ -58,10 +58,12 @@ export function TenantDashboard({ onNavigate }: { onNavigate: (p: TenantPage) =>
                 </div>
               </div>
               <div className="text-lg sm:text-2xl font-bold tabular-nums">{kpi.value}</div>
-              <div className={`text-[10px] sm:text-xs font-medium mt-1 flex items-center gap-1 ${kpi.trendUp ? "text-green-600" : "text-muted-foreground"}`}>
-                {kpi.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                <span className="truncate">{kpi.trend}</span>
-              </div>
+              {kpi.trend && (
+                <div className={`text-[10px] sm:text-xs font-medium mt-1 flex items-center gap-1 ${kpi.trendUp ? "text-green-600" : "text-muted-foreground"}`}>
+                  {kpi.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                  <span className="truncate">{kpi.trend}</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}

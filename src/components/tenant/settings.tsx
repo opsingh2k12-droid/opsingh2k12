@@ -1,90 +1,246 @@
 "use client"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { useAppTheme, THEMES } from "@/lib/theme-context"
-import { Building2, CreditCard, Palette, Bell, Database, Check, Lock } from "lucide-react"
+import { Building2, CreditCard, Palette, Bell, Database, Check, Lock, FileText, ImageIcon } from "lucide-react"
 import { useState } from "react"
 import { formatINR, formatDate } from "@/lib/format"
 import { toast } from "sonner"
 import { ChangePasswordCard } from "@/components/change-password-card"
+import { FileUpload } from "@/components/file-upload"
 
-export function TenantSettings({ tenant }: { tenant: any }) {
-  const [tab, setTab] = useState<"profile" | "subscription" | "appearance" | "security">("profile")
+export function TenantSettings({ tenant: initialTenant }: { tenant: any }) {
+  const queryClient = useQueryClient()
+  const [tab, setTab] = useState<"profile" | "invoice-settings" | "subscription" | "appearance" | "security">("profile")
   const { theme, setTheme } = useAppTheme()
-  const sub = tenant.subscriptions?.[0]
+  const sub = initialTenant.subscriptions?.[0]
   const plan = sub?.plan
+
+  // Fetch fresh tenant data (includes logo, signature, etc.)
+  const { data, isLoading } = useQuery({
+    queryKey: ["tenant-settings"],
+    queryFn: async () => (await fetch("/api/tenant/settings")).json(),
+  })
+
+  const [form, setForm] = useState<any>(null)
+
+  // Initialize form when data loads
+  if (data?.tenant && !form) {
+    setForm({
+      ...data.tenant,
+      fiscalYearStartMonth: String(data.tenant.fiscalYearStartMonth || 4),
+    })
+  }
+
+  const saveMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await fetch("/api/tenant/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenant-settings"] })
+      queryClient.invalidateQueries({ queryKey: ["tenant-me"] })
+      toast.success("Settings saved")
+    },
+    onError: () => toast.error("Failed to save"),
+  })
+
+  const handleSave = () => {
+    saveMutation.mutate(form)
+  }
+
+  if (isLoading || !form) {
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Loading settings...</div>
+  }
 
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your business profile, GST, subscription & appearance</p>
+        <p className="text-sm text-muted-foreground mt-1">Manage your business profile, invoice settings, subscription & appearance</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-5">
         {/* Settings nav */}
         <div className="flex flex-row lg:flex-col gap-1 overflow-x-auto">
           <SettingsTab active={tab === "profile"} onClick={() => setTab("profile")} icon={<Building2 className="w-4 h-4" />}>Business Profile</SettingsTab>
+          <SettingsTab active={tab === "invoice-settings"} onClick={() => setTab("invoice-settings")} icon={<FileText className="w-4 h-4" />}>Invoice Settings</SettingsTab>
           <SettingsTab active={tab === "subscription"} onClick={() => setTab("subscription")} icon={<CreditCard className="w-4 h-4" />}>Subscription</SettingsTab>
           <SettingsTab active={tab === "appearance"} onClick={() => setTab("appearance")} icon={<Palette className="w-4 h-4" />}>Appearance & Theme</SettingsTab>
           <SettingsTab active={tab === "security"} onClick={() => setTab("security")} icon={<Lock className="w-4 h-4" />}>Security</SettingsTab>
         </div>
 
         <div>
+          {/* ============ BUSINESS PROFILE ============ */}
           {tab === "profile" && (
             <Card>
               <CardContent className="p-6 space-y-4">
                 <div>
                   <h3 className="font-semibold text-base">Business Profile</h3>
-                  <p className="text-xs text-muted-foreground">This info appears on every invoice you generate.</p>
+                  <p className="text-xs text-muted-foreground">This info appears on every invoice and estimate you generate.</p>
                 </div>
+
+                {/* Logo upload */}
+                <FileUpload
+                  type="logo"
+                  label="Business Logo"
+                  value={form.logo}
+                  onChange={(filename) => setForm({ ...form, logo: filename })}
+                  previewClass="w-28 h-28"
+                />
+
+                <Separator />
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-xs">Business Name</Label>
-                    <Input defaultValue={tenant.businessName} className="mt-1" />
+                    <Input value={form.businessName || ""} onChange={(e) => setForm({ ...form, businessName: e.target.value })} className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">Legal Name</Label>
-                    <Input defaultValue={tenant.legalName || ""} className="mt-1" />
+                    <Input value={form.legalName || ""} onChange={(e) => setForm({ ...form, legalName: e.target.value })} className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">GSTIN</Label>
-                    <Input defaultValue={tenant.gstin || ""} className="mt-1" />
+                    <Input value={form.gstin || ""} onChange={(e) => setForm({ ...form, gstin: e.target.value })} className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">PAN</Label>
-                    <Input defaultValue={tenant.pan || ""} className="mt-1" />
+                    <Input value={form.pan || ""} onChange={(e) => setForm({ ...form, pan: e.target.value })} className="mt-1" />
                   </div>
                   <div className="sm:col-span-2">
                     <Label className="text-xs">Address</Label>
-                    <Input defaultValue={tenant.address || ""} className="mt-1" />
+                    <Input value={form.address || ""} onChange={(e) => setForm({ ...form, address: e.target.value })} className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">Phone</Label>
-                    <Input defaultValue={tenant.phone || ""} className="mt-1" />
+                    <Input value={form.phone || ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">Email</Label>
-                    <Input defaultValue={tenant.email || ""} className="mt-1" />
+                    <Input value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">City</Label>
-                    <Input defaultValue={tenant.city || ""} className="mt-1" />
+                    <Input value={form.city || ""} onChange={(e) => setForm({ ...form, city: e.target.value })} className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-xs">State Code</Label>
-                    <Input defaultValue={tenant.stateCode || ""} className="mt-1" />
+                    <Input value={form.stateCode || ""} onChange={(e) => setForm({ ...form, stateCode: e.target.value })} className="mt-1" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Fiscal Year Start Month</Label>
+                    <Select value={form.fiscalYearStartMonth} onValueChange={(v) => setForm({ ...form, fiscalYearStartMonth: v })}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">January</SelectItem>
+                        <SelectItem value="2">February</SelectItem>
+                        <SelectItem value="3">March</SelectItem>
+                        <SelectItem value="4">April (Indian FY default)</SelectItem>
+                        <SelectItem value="5">May</SelectItem>
+                        <SelectItem value="6">June</SelectItem>
+                        <SelectItem value="7">July</SelectItem>
+                        <SelectItem value="8">August</SelectItem>
+                        <SelectItem value="9">September</SelectItem>
+                        <SelectItem value="10">October</SelectItem>
+                        <SelectItem value="11">November</SelectItem>
+                        <SelectItem value="12">December</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-                <Button onClick={() => toast.success("Profile saved (demo)")}>Save Changes</Button>
+                <p className="text-[10px] text-muted-foreground">
+                  💡 Fiscal Year determines your financial year for reports. In India, it's April 1 to March 31 by default. Reports will use this to calculate yearly summaries.
+                </p>
+
+                <Button onClick={handleSave} disabled={saveMutation.isPending}>
+                  {saveMutation.isPending ? "Saving..." : "Save Changes"}
+                </Button>
               </CardContent>
             </Card>
           )}
 
+          {/* ============ INVOICE SETTINGS ============ */}
+          {tab === "invoice-settings" && (
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <div>
+                  <h3 className="font-semibold text-base">Invoice & Estimate Settings</h3>
+                  <p className="text-xs text-muted-foreground">Configure prefixes, default terms, and signature for your invoices and estimates.</p>
+                </div>
+
+                {/* Prefixes */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs">Invoice Prefix</Label>
+                    <Input
+                      value={form.invoicePrefix || ""}
+                      onChange={(e) => setForm({ ...form, invoicePrefix: e.target.value })}
+                      placeholder="INV-"
+                      className="mt-1"
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1">e.g. INV- → INV-2026-0001</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Estimate Prefix</Label>
+                    <Input
+                      value={form.estimatePrefix || ""}
+                      onChange={(e) => setForm({ ...form, estimatePrefix: e.target.value })}
+                      placeholder="EST-"
+                      className="mt-1"
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1">e.g. EST- → EST-2026-0001</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Terms & Conditions */}
+                <div>
+                  <Label className="text-xs">Default Terms & Conditions</Label>
+                  <Textarea
+                    value={form.termsAndConditions || ""}
+                    onChange={(e) => setForm({ ...form, termsAndConditions: e.target.value })}
+                    placeholder="e.g. Payment due within 15 days. Interest @18% p.a. on delayed payments. Goods once sold will not be taken back."
+                    rows={4}
+                    className="mt-1"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    This will be pre-filled when creating new invoices/estimates. You can edit per invoice.
+                  </p>
+                </div>
+
+                <Separator />
+
+                {/* Signature upload */}
+                <FileUpload
+                  type="signature"
+                  label="Authorized Signature (appears on invoices)"
+                  value={form.signature}
+                  onChange={(filename) => setForm({ ...form, signature: filename })}
+                  previewClass="w-40 h-20"
+                />
+
+                <Button onClick={handleSave} disabled={saveMutation.isPending}>
+                  {saveMutation.isPending ? "Saving..." : "Save Invoice Settings"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ============ SUBSCRIPTION ============ */}
           {tab === "subscription" && (
             <Card>
               <CardContent className="p-6 space-y-4">
@@ -105,11 +261,11 @@ export function TenantSettings({ tenant }: { tenant: any }) {
                   <Button variant="outline" size="sm">Manage</Button>
                 </div>
 
-                {tenant.status === "trial" && (
+                {initialTenant.status === "trial" && (
                   <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">⚠</div>
                     <div className="flex-1">
-                      <div className="font-semibold text-sm">Trial {tenant.trialEndsAt && `ends in ${Math.ceil((new Date(tenant.trialEndsAt).getTime() - Date.now()) / 86400000)} days`}</div>
+                      <div className="font-semibold text-sm">Trial {initialTenant.trialEndsAt && `ends in ${Math.ceil((new Date(initialTenant.trialEndsAt).getTime() - Date.now()) / 86400000)} days`}</div>
                       <div className="text-xs text-muted-foreground">Add a payment method to continue after trial</div>
                     </div>
                     <Button size="sm">Add Payment</Button>
@@ -135,6 +291,7 @@ export function TenantSettings({ tenant }: { tenant: any }) {
             </Card>
           )}
 
+          {/* ============ APPEARANCE ============ */}
           {tab === "appearance" && (
             <Card>
               <CardContent className="p-6 space-y-4">
@@ -175,6 +332,7 @@ export function TenantSettings({ tenant }: { tenant: any }) {
             </Card>
           )}
 
+          {/* ============ SECURITY ============ */}
           {tab === "security" && (
             <div className="space-y-4">
               <Card>

@@ -1,5 +1,5 @@
 "use client"
-import { useQuery, useMutation } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { Plus, Trash2, Save, FileDown, MessageCircle, Mail, Printer } from "lucide-react"
-import { useState, useMemo } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Plus, Trash2, Save, FileDown, MessageCircle, Mail, Printer, UserPlus, PackagePlus } from "lucide-react"
+import { useState, useMemo, useEffect } from "react"
 import { formatINR } from "@/lib/format"
 import { toast } from "sonner"
 
@@ -21,7 +22,8 @@ interface InvoiceLine {
   gstRate: number
 }
 
-export function CreateInvoice({ onDone }: { onDone: () => void }) {
+export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => void; docType?: "invoice" | "estimate" }) {
+  const queryClient = useQueryClient()
   const [partyId, setPartyId] = useState("")
   const [supplyType, setSupplyType] = useState<"intra" | "inter">("intra")
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10))
@@ -30,8 +32,23 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
   const [terms, setTerms] = useState("Payment due within 15 days. Interest @18% p.a. on delayed payments.")
   const [lines, setLines] = useState<InvoiceLine[]>([{ name: "", hsn: "", qty: 1, rate: 0, gstRate: 18 }])
 
+  // Inline add dialogs
+  const [showAddParty, setShowAddParty] = useState(false)
+  const [showAddItem, setShowAddItem] = useState(false)
+  const [newParty, setNewParty] = useState({ name: "", phone: "", gstin: "", city: "", state: "Maharashtra", stateCode: "27" })
+  const [newItem, setNewItem] = useState({ name: "", hsn: "", salePrice: "", gstRate: "18", stockQty: "0" })
+
   const { data: partiesData } = useQuery({ queryKey: ["tenant-parties"], queryFn: async () => (await fetch("/api/tenant/parties")).json() })
   const { data: itemsData } = useQuery({ queryKey: ["tenant-items"], queryFn: async () => (await fetch("/api/tenant/items")).json() })
+  const { data: settingsData } = useQuery({ queryKey: ["tenant-settings"], queryFn: async () => (await fetch("/api/tenant/settings")).json() })
+
+  // Pre-fill terms from tenant settings
+  useEffect(() => {
+    if (settingsData?.tenant?.termsAndConditions && terms === "Payment due within 15 days. Interest @18% p.a. on delayed payments.") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTerms(settingsData.tenant.termsAndConditions)
+    }
+  }, [settingsData])
 
   const customers = (partiesData?.parties || []).filter((p: any) => p.type !== "supplier")
   const items = itemsData?.items || []
@@ -45,10 +62,59 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
       return res.json()
     },
     onSuccess: (data) => {
-      toast.success(`Invoice ${data.invoice.invoiceNumber} created!`)
+      toast.success(`${docType === "estimate" ? "Estimate" : "Invoice"} ${data.invoice.invoiceNumber} created!`)
       onDone()
     },
-    onError: () => toast.error("Failed to create invoice"),
+    onError: () => toast.error(`Failed to create ${docType}`),
+  })
+
+  // Inline add party mutation
+  const addPartyMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await fetch("/api/tenant/parties", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["tenant-parties"] })
+      setPartyId(data.party.id)
+      setShowAddParty(false)
+      setNewParty({ name: "", phone: "", gstin: "", city: "", state: "Maharashtra", stateCode: "27" })
+      toast.success("Party added and selected")
+    },
+    onError: () => toast.error("Failed to add party"),
+  })
+
+  // Inline add item mutation
+  const addItemMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await fetch("/api/tenant/items", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+      if (!res.ok) throw new Error()
+      return res.json()
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["tenant-items"] })
+      // Auto-select the new item in the first empty line
+      const newLine = {
+        itemId: data.item.id,
+        name: data.item.name,
+        hsn: data.item.hsn || "",
+        qty: 1,
+        rate: data.item.salePrice,
+        gstRate: data.item.gstRate,
+      }
+      setLines((prev) => {
+        const idx = prev.findIndex((l) => !l.name)
+        if (idx >= 0) {
+          return prev.map((l, i) => (i === idx ? newLine : l))
+        }
+        return [...prev, newLine]
+      })
+      setShowAddItem(false)
+      setNewItem({ name: "", hsn: "", salePrice: "", gstRate: "18", stockQty: "0" })
+      toast.success("Item added and added to invoice")
+    },
+    onError: () => toast.error("Failed to add item"),
   })
 
   const updateLine = (i: number, patch: Partial<InvoiceLine>) => {
@@ -91,7 +157,7 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
   const handleSave = (status: string = "unpaid") => {
     if (!partyId) return toast.error("Select a customer")
     if (lines.length === 0 || lines.some((l) => !l.name || l.qty <= 0)) return toast.error("Add at least one valid item")
-    createMutation.mutate({ partyId, supplyType, invoiceDate, discountPct, items: lines, notes, terms, status })
+    createMutation.mutate({ partyId, supplyType, invoiceDate, discountPct, items: lines, notes, terms, status, type: docType })
   }
 
   const handleWhatsApp = () => {
@@ -148,7 +214,12 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
           {/* Customer */}
           <Card>
             <CardContent className="p-4">
-              <Label>Bill To (Customer)</Label>
+              <div className="flex items-center justify-between">
+                <Label>Bill To (Customer)</Label>
+                <Button type="button" variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setShowAddParty(true)}>
+                  <UserPlus className="w-3 h-3" /> New Party
+                </Button>
+              </div>
               <Select value={partyId} onValueChange={setPartyId}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Select customer..." /></SelectTrigger>
                 <SelectContent>
@@ -170,8 +241,11 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
 
           {/* Items table */}
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 flex-row items-center justify-between">
               <CardTitle className="text-base">Items</CardTitle>
+              <Button type="button" variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setShowAddItem(true)}>
+                <PackagePlus className="w-3 h-3" /> New Item
+              </Button>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -309,7 +383,7 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
               <Separator />
               <div className="space-y-2">
                 <Button className="w-full" onClick={() => handleSave("unpaid")} disabled={createMutation.isPending}>
-                  <Save className="w-4 h-4 mr-2" /> Save & Generate
+                  <Save className="w-4 h-4 mr-2" /> Save & Generate {docType === "estimate" ? "Estimate" : "Invoice"}
                 </Button>
                 <Button variant="outline" className="w-full" onClick={() => toast.info("PDF will be available after saving")}>
                   <FileDown className="w-4 h-4 mr-2" /> Download PDF
@@ -325,6 +399,93 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
           </Card>
         </div>
       </div>
+
+      {/* Inline Add Party Dialog */}
+      <Dialog open={showAddParty} onOpenChange={setShowAddParty}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Party</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); addPartyMutation.mutate({ ...newParty, type: "customer", openingBalance: 0 }) }} className="space-y-3">
+            <div>
+              <Label className="text-xs">Name *</Label>
+              <Input required value={newParty.name} onChange={(e) => setNewParty({ ...newParty, name: e.target.value })} className="mt-1" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Phone</Label>
+                <Input value={newParty.phone} onChange={(e) => setNewParty({ ...newParty, phone: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">GSTIN</Label>
+                <Input value={newParty.gstin} onChange={(e) => setNewParty({ ...newParty, gstin: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">City</Label>
+                <Input value={newParty.city} onChange={(e) => setNewParty({ ...newParty, city: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">State Code</Label>
+                <Input value={newParty.stateCode} onChange={(e) => setNewParty({ ...newParty, stateCode: e.target.value })} className="mt-1" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowAddParty(false)}>Cancel</Button>
+              <Button type="submit" disabled={addPartyMutation.isPending}>
+                {addPartyMutation.isPending ? "Adding..." : "Add & Select"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Inline Add Item Dialog */}
+      <Dialog open={showAddItem} onOpenChange={setShowAddItem}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Item</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); addItemMutation.mutate({ ...newItem, unit: "pcs", purchasePrice: 0, reorderLevel: 10 }) }} className="space-y-3">
+            <div>
+              <Label className="text-xs">Item Name *</Label>
+              <Input required value={newItem.name} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} className="mt-1" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">HSN Code</Label>
+                <Input value={newItem.hsn} onChange={(e) => setNewItem({ ...newItem, hsn: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Sale Price (₹) *</Label>
+                <Input type="number" step="0.01" required value={newItem.salePrice} onChange={(e) => setNewItem({ ...newItem, salePrice: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">GST Rate</Label>
+                <Select value={newItem.gstRate} onValueChange={(v) => setNewItem({ ...newItem, gstRate: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">0%</SelectItem>
+                    <SelectItem value="5">5%</SelectItem>
+                    <SelectItem value="12">12%</SelectItem>
+                    <SelectItem value="18">18%</SelectItem>
+                    <SelectItem value="28">28%</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Stock Qty</Label>
+                <Input type="number" value={newItem.stockQty} onChange={(e) => setNewItem({ ...newItem, stockQty: e.target.value })} className="mt-1" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowAddItem(false)}>Cancel</Button>
+              <Button type="submit" disabled={addItemMutation.isPending}>
+                {addItemMutation.isPending ? "Adding..." : "Add to Invoice"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

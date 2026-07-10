@@ -27,6 +27,13 @@ model Tenant {
   email         String?
   status        String   @default("trial") // trial | active | suspended | cancelled
   trialEndsAt   DateTime?
+  // Branding & business settings
+  logo          String?  // uploaded logo filename
+  signature     String?  // uploaded signature filename
+  termsAndConditions String? // default T&C for invoices
+  invoicePrefix String   @default("INV-") // e.g. INV-2026-0001
+  estimatePrefix String  @default("EST-") // e.g. EST-2026-0001
+  fiscalYearStartMonth Int @default(4) // 1-12, default April (Indian FY)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -157,6 +164,7 @@ model Invoice {
   party           Party    @relation(fields: [partyId], references: [id])
   invoiceDate     DateTime @default(now())
   supplyType      String   @default("intra") // intra (CGST+SGST) | inter (IGST)
+  type            String   @default("invoice") // invoice | estimate
   status          String   @default("unpaid") // unpaid | partial | paid | overdue | cancelled
   subtotal        Float    @default(0)
   discountPct     Float    @default(0)
