@@ -2,13 +2,17 @@
 import { useQuery } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { IndianRupee, TrendingUp, ShoppingCart, Receipt, FileDown } from "lucide-react"
+import { IndianRupee, TrendingUp, ShoppingCart, Receipt, FileDown, Calendar } from "lucide-react"
 import { formatINR } from "@/lib/format"
+import { useState } from "react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function TenantReports() {
+  const [fyOffset, setFyOffset] = useState(0)
+
   const { data, isLoading } = useQuery({
-    queryKey: ["tenant-reports"],
-    queryFn: async () => (await fetch("/api/tenant/reports")).json(),
+    queryKey: ["tenant-reports", fyOffset],
+    queryFn: async () => (await fetch(`/api/tenant/reports?yearOffset=${fyOffset}`)).json(),
   })
 
   const maxSale = Math.max(...((data?.salesByDay || []).map((s: any) => Number(s.total)) || [1]), 1)
@@ -18,14 +22,26 @@ export function TenantReports() {
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2"><TrendingUp className="w-6 h-6 text-primary" /> Reports & Analytics</h1>
-          <p className="text-sm text-muted-foreground mt-1">This month · Current financial period</p>
+          <p className="text-sm text-muted-foreground mt-1">Financial Year: <span className="font-semibold text-foreground">{data?.fyLabel || "—"}</span></p>
         </div>
-        <Button variant="outline" size="sm"><FileDown className="w-4 h-4 mr-1.5" /> GSTR-1 Export</Button>
+        <div className="flex gap-2 items-center">
+          <Select value={String(fyOffset)} onValueChange={(v) => setFyOffset(Number(v))}>
+            <SelectTrigger className="w-[140px]"><Calendar className="w-3.5 h-3.5 mr-1.5" /><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {(data?.fyOptions || []).map((fy: any) => (
+                <SelectItem key={fy.offset} value={String(fy.offset)}>
+                  FY {fy.label} {fy.isCurrent ? "(Current)" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="sm"><FileDown className="w-4 h-4 mr-1.5" /> GSTR-1 Export</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard label="Total Sales" value={formatINR(data?.totalSales || 0)} icon={<IndianRupee className="w-4 h-4" />} trend="+18.2% vs last month" trendUp />
-        <KpiCard label="Total Purchases" value={formatINR(data?.totalPurchases || 0)} icon={<ShoppingCart className="w-4 h-4" />} trend="+9.5%" trendUp />
+        <KpiCard label={`Total Sales (FY ${data?.fyLabel || ""})`} value={formatINR(data?.totalSales || 0)} icon={<IndianRupee className="w-4 h-4" />} trend={`${data?.invoiceCount || 0} invoices`} trendUp />
+        <KpiCard label="Total Purchases" value={formatINR(data?.totalPurchases || 0)} icon={<ShoppingCart className="w-4 h-4" />} trend="" trendUp />
         <KpiCard label="Output GST" value={formatINR(data?.totalGst || 0)} icon={<Receipt className="w-4 h-4" />} trend="Collected" trendUp />
         <KpiCard label="Net GST Payable" value={formatINR(data?.netGst || 0)} icon={<IndianRupee className="w-4 h-4" />} trend={`After ITC: ${formatINR(data?.itcAvailable || 0)}`} trendUp={false} />
       </div>

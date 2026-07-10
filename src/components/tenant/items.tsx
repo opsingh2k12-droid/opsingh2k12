@@ -18,7 +18,7 @@ export function TenantItems() {
   const [filter, setFilter] = useState<"all" | "low" | "out">("all")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editItem, setEditItem] = useState<any>(null)
-  const [form, setForm] = useState({ name: "", sku: "", hsn: "", category: "", unit: "pcs", salePrice: "", purchasePrice: "", gstRate: "18", stockQty: "", reorderLevel: "10" })
+  const [form, setForm] = useState({ name: "", sku: "", hsn: "", category: "", unit: "pcs", salePrice: "", purchasePrice: "", gstRate: "18", gstType: "exclusive", stockQty: "", reorderLevel: "10" })
 
   const { data, isLoading } = useQuery({
     queryKey: ["tenant-items"],
@@ -57,14 +57,14 @@ export function TenantItems() {
     setForm({
       name: item.name, sku: item.sku || "", hsn: item.hsn || "", category: item.category || "",
       unit: item.unit || "pcs", salePrice: String(item.salePrice), purchasePrice: String(item.purchasePrice || 0),
-      gstRate: String(item.gstRate), stockQty: String(item.stockQty), reorderLevel: String(item.reorderLevel),
+      gstRate: String(item.gstRate), gstType: item.gstType || "exclusive", stockQty: String(item.stockQty), reorderLevel: String(item.reorderLevel),
     })
     setDialogOpen(true)
   }
 
   const openNew = () => {
     setEditItem(null)
-    setForm({ name: "", sku: "", hsn: "", category: "", unit: "pcs", salePrice: "", purchasePrice: "", gstRate: "18", stockQty: "", reorderLevel: "10" })
+    setForm({ name: "", sku: "", hsn: "", category: "", unit: "pcs", salePrice: "", purchasePrice: "", gstRate: "18", gstType: "exclusive", stockQty: "", reorderLevel: "10" })
     setDialogOpen(true)
   }
 
@@ -147,6 +147,21 @@ export function TenantItems() {
                       <SelectItem value="28">28%</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="gstType">GST Type (How is sale price calculated?)</Label>
+                  <Select value={form.gstType} onValueChange={(v) => setForm({ ...form, gstType: v })}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="exclusive">Exclusive — Price does NOT include GST (GST added on top)</SelectItem>
+                      <SelectItem value="inclusive">Inclusive — Price INCLUDES GST (GST back-calculated)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {form.gstType === "inclusive"
+                      ? "💡 Inclusive: ₹1180 rate → Taxable ₹1000 + GST ₹180 (customer pays ₹1180)"
+                      : "💡 Exclusive: ₹1000 rate → Taxable ₹1000 + GST ₹180 (customer pays ₹1180)"}
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="stockQty">Stock Quantity</Label>

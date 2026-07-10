@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { getTenantContext } from "@/lib/session"
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const ctx = await getTenantContext()
   if (!ctx || ctx.role === "super_admin" || !ctx.tenantId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
+  const { searchParams } = new URL(req.url)
+  const type = searchParams.get("type") // "invoice" | "estimate" | null (all)
+
   const invoices = await db.invoice.findMany({
-    where: { tenantId: ctx.tenantId },
+    where: {
+      tenantId: ctx.tenantId,
+      ...(type ? { type } : {}),
+    },
     include: { party: true, items: true, payments: true },
     orderBy: { invoiceDate: "desc" },
   })
@@ -32,16 +38,31 @@ export async function POST(req: NextRequest) {
 
   let subtotal = 0
   let totalGst = 0
+  let totalTaxable = 0
   const itemLines = items.map((it: any) => {
-    const amount = Number(it.qty) * Number(it.rate)
+    const gstType = it.gstType === "inclusive" ? "inclusive" : "exclusive"
+    const amount = Number(it.qty) * Number(it.rate) // qty * rate (as entered)
     const lineDiscount = (amount * discount) / 100
-    const taxableAmount = amount - lineDiscount
-    const gst = (taxableAmount * Number(it.gstRate)) / 100
+    const netAmount = amount - lineDiscount // after discount
+
+    let taxableAmount: number
+    let gst: number
+    if (gstType === "inclusive") {
+      // Rate includes GST → back-calculate taxable
+      taxableAmount = netAmount / (1 + Number(it.gstRate) / 100)
+      gst = netAmount - taxableAmount
+    } else {
+      // Exclusive: rate is taxable → GST added on top
+      taxableAmount = netAmount
+      gst = (taxableAmount * Number(it.gstRate)) / 100
+    }
+
     const cgst = isInter ? 0 : gst / 2
     const sgst = isInter ? 0 : gst / 2
     const igst = isInter ? gst : 0
     subtotal += amount
     totalGst += gst
+    totalTaxable += taxableAmount
     return {
       itemId: it.itemId || null,
       name: it.name,
@@ -49,6 +70,7 @@ export async function POST(req: NextRequest) {
       qty: Number(it.qty),
       rate: Number(it.rate),
       gstRate: Number(it.gstRate),
+      gstType,
       amount,
       taxableAmount,
       cgst,
@@ -58,7 +80,7 @@ export async function POST(req: NextRequest) {
   })
 
   const discountAmount = (subtotal * discount) / 100
-  const taxableAmount = subtotal - discountAmount
+  const taxableAmount = totalTaxable // sum of per-line taxable (handles mixed inclusive/exclusive)
   const cgst = isInter ? 0 : totalGst / 2
   const sgst = isInter ? 0 : totalGst / 2
   const igst = isInter ? totalGst : 0

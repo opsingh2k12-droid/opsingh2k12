@@ -123,6 +123,7 @@ model Item {
   salePrice    Float
   purchasePrice Float  @default(0)
   gstRate      Float   @default(18) // 0, 5, 12, 18, 28
+  gstType      String  @default("exclusive") // exclusive | inclusive
   stockQty     Int     @default(0)
   reorderLevel Int     @default(10)
   barcode      String?
@@ -197,6 +198,7 @@ model InvoiceItem {
   qty         Float
   rate        Float
   gstRate     Float
+  gstType     String  @default("exclusive") // exclusive | inclusive
   amount      Float   // qty * rate
   taxableAmount Float
   cgst        Float   @default(0)

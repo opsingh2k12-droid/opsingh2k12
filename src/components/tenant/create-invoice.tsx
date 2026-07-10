@@ -20,6 +20,7 @@ interface InvoiceLine {
   qty: number
   rate: number
   gstRate: number
+  gstType: "inclusive" | "exclusive"
 }
 
 export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => void; docType?: "invoice" | "estimate" }) {
@@ -30,13 +31,13 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
   const [discountPct, setDiscountPct] = useState(0)
   const [notes, setNotes] = useState("Thank you for your business. Goods once sold will not be taken back.")
   const [terms, setTerms] = useState("Payment due within 15 days. Interest @18% p.a. on delayed payments.")
-  const [lines, setLines] = useState<InvoiceLine[]>([{ name: "", hsn: "", qty: 1, rate: 0, gstRate: 18 }])
+  const [lines, setLines] = useState<InvoiceLine[]>([{ name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive" }])
 
   // Inline add dialogs
   const [showAddParty, setShowAddParty] = useState(false)
   const [showAddItem, setShowAddItem] = useState(false)
   const [newParty, setNewParty] = useState({ name: "", phone: "", gstin: "", city: "", state: "Maharashtra", stateCode: "27" })
-  const [newItem, setNewItem] = useState({ name: "", hsn: "", salePrice: "", gstRate: "18", stockQty: "0" })
+  const [newItem, setNewItem] = useState({ name: "", hsn: "", salePrice: "", gstRate: "18", gstType: "exclusive", stockQty: "0" })
 
   const { data: partiesData } = useQuery({ queryKey: ["tenant-parties"], queryFn: async () => (await fetch("/api/tenant/parties")).json() })
   const { data: itemsData } = useQuery({ queryKey: ["tenant-items"], queryFn: async () => (await fetch("/api/tenant/items")).json() })
@@ -102,6 +103,7 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
         qty: 1,
         rate: data.item.salePrice,
         gstRate: data.item.gstRate,
+        gstType: data.item.gstType || "exclusive",
       }
       setLines((prev) => {
         const idx = prev.findIndex((l) => !l.name)
@@ -111,7 +113,7 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
         return [...prev, newLine]
       })
       setShowAddItem(false)
-      setNewItem({ name: "", hsn: "", salePrice: "", gstRate: "18", stockQty: "0" })
+      setNewItem({ name: "", hsn: "", salePrice: "", gstRate: "18", gstType: "exclusive", stockQty: "0" })
       toast.success("Item added and added to invoice")
     },
     onError: () => toast.error("Failed to add item"),
@@ -124,25 +126,37 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
   const selectItem = (i: number, itemId: string) => {
     const item = items.find((it: any) => it.id === itemId)
     if (item) {
-      updateLine(i, { itemId: item.id, name: item.name, hsn: item.hsn || "", rate: item.salePrice, gstRate: item.gstRate })
+      updateLine(i, { itemId: item.id, name: item.name, hsn: item.hsn || "", rate: item.salePrice, gstRate: item.gstRate, gstType: item.gstType || "exclusive" })
     }
   }
 
-  const addLine = () => setLines([...lines, { name: "", hsn: "", qty: 1, rate: 0, gstRate: 18 }])
+  const addLine = () => setLines([...lines, { name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive" }])
   const removeLine = (i: number) => setLines(lines.filter((_, idx) => idx !== i))
 
   const totals = useMemo(() => {
     const isInter = supplyType === "inter"
-    let subtotal = 0
+    let subtotal = 0 // sum of qty * rate (as entered)
     let totalGst = 0
     let taxableAmount = 0
     for (const l of lines) {
-      const amount = l.qty * l.rate
+      const amount = l.qty * l.rate // what user entered (rate * qty)
       subtotal += amount
       const lineDiscount = (amount * discountPct) / 100
-      const taxable = amount - lineDiscount
-      taxableAmount += taxable
-      totalGst += (taxable * l.gstRate) / 100
+      const netAmount = amount - lineDiscount // after discount
+
+      if (l.gstType === "inclusive") {
+        // Rate includes GST → back-calculate taxable
+        const taxable = netAmount / (1 + l.gstRate / 100)
+        const gst = netAmount - taxable
+        taxableAmount += taxable
+        totalGst += gst
+      } else {
+        // Exclusive: rate is taxable → GST added on top
+        const taxable = netAmount
+        const gst = (taxable * l.gstRate) / 100
+        taxableAmount += taxable
+        totalGst += gst
+      }
     }
     const discountAmount = (subtotal * discountPct) / 100
     const cgst = isInter ? 0 : totalGst / 2
@@ -291,6 +305,14 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                                 <SelectItem value="28">28%</SelectItem>
                               </SelectContent>
                             </Select>
+                            <button
+                              type="button"
+                              onClick={() => updateLine(i, { gstType: line.gstType === "inclusive" ? "exclusive" : "inclusive" })}
+                              className={`mt-1 w-full text-[9px] font-semibold px-1 py-0.5 rounded ${line.gstType === "inclusive" ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"}`}
+                              title="Click to toggle GST inclusive/exclusive"
+                            >
+                              {line.gstType === "inclusive" ? "INCL" : "EXCL"}
+                            </button>
                           </td>
                           <td className="p-2 text-right font-semibold tabular-nums">{formatINR(amount)}</td>
                           <td className="p-2">
@@ -475,6 +497,16 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
               <div>
                 <Label className="text-xs">Stock Qty</Label>
                 <Input type="number" value={newItem.stockQty} onChange={(e) => setNewItem({ ...newItem, stockQty: e.target.value })} className="mt-1" />
+              </div>
+              <div className="col-span-2">
+                <Label className="text-xs">GST Type</Label>
+                <Select value={newItem.gstType} onValueChange={(v) => setNewItem({ ...newItem, gstType: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="exclusive">Exclusive — GST added on top of price</SelectItem>
+                    <SelectItem value="inclusive">Inclusive — Price includes GST</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter>

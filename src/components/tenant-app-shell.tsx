@@ -17,13 +17,12 @@ import { TenantReports } from "@/components/tenant/reports"
 import { TenantSettings } from "@/components/tenant/settings"
 import { useAppTheme, THEMES, ThemeName } from "@/lib/theme-context"
 
-export type TenantPage = "dashboard" | "items" | "parties" | "create-invoice" | "create-estimate" | "invoices" | "purchases" | "reports" | "settings"
+export type TenantPage = "dashboard" | "items" | "parties" | "create-invoice" | "create-estimate" | "invoices" | "estimates" | "purchases" | "reports" | "settings"
 
 const navItems: { id: TenantPage; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
   { id: "invoices", label: "Sales / Invoices", icon: <FileText className="w-4 h-4" /> },
-  { id: "create-invoice", label: "New Invoice", icon: <Plus className="w-4 h-4" /> },
-  { id: "create-estimate", label: "New Estimate", icon: <FileText className="w-4 h-4" /> },
+  { id: "estimates", label: "Estimates", icon: <FileText className="w-4 h-4" /> },
   { id: "items", label: "Items / Inventory", icon: <Boxes className="w-4 h-4" /> },
   { id: "parties", label: "Parties", icon: <Users className="w-4 h-4" /> },
   { id: "purchases", label: "Purchase", icon: <ShoppingCart className="w-4 h-4" /> },
@@ -186,8 +185,9 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
           {page === "items" && <TenantItems />}
           {page === "parties" && <TenantParties />}
           {page === "create-invoice" && <CreateInvoice onDone={() => navigate("invoices")} />}
-          {page === "create-estimate" && <CreateInvoice onDone={() => navigate("invoices")} docType="estimate" />}
-          {page === "invoices" && <InvoicesList onNew={() => navigate("create-invoice")} />}
+          {page === "create-estimate" && <CreateInvoice onDone={() => navigate("estimates")} docType="estimate" />}
+          {page === "invoices" && <InvoicesList onNew={() => navigate("create-invoice")} docType="invoice" />}
+          {page === "estimates" && <InvoicesList onNew={() => navigate("create-estimate")} docType="estimate" />}
           {page === "purchases" && <PurchasesList />}
           {page === "reports" && <TenantReports />}
           {page === "settings" && <TenantSettings tenant={tenant} />}
