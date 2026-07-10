@@ -9,11 +9,28 @@ interface TemplateProps {
   party: any
 }
 
-// Common GST rate label helper
+// Common GST rate label helper (for items table — just rate%)
 function gstLabel(rate: number, isInter: boolean): string {
+  return `${rate}%`
+}
+
+// GST label for totals block (shows CGST 9% / SGST 9% / IGST 18%)
+function gstTotalLabel(rate: number, isInter: boolean, type: "cgst" | "sgst" | "igst"): string {
   const halfRate = (rate / 2).toFixed(2).replace(/\.00$/, "")
-  if (isInter) return `IGST ${rate}%`
-  return `CGST ${halfRate}% + SGST ${halfRate}%`
+  if (isInter) {
+    return type === "igst" ? `IGST ${rate}%` : ""
+  }
+  if (type === "cgst") return `CGST ${halfRate}%`
+  if (type === "sgst") return `SGST ${halfRate}%`
+  return ""
+}
+
+// Get GST rate for an invoice (uses first item's rate, or 0)
+function getInvoiceGstRate(invoice: any): number {
+  if (invoice.items && invoice.items.length > 0) {
+    return invoice.items[0].gstRate || 0
+  }
+  return 0
 }
 
 // ============ TEMPLATE 1: MODERN (clean, minimal) ============
@@ -278,6 +295,8 @@ function ItemsTable({ invoice, isInter, bordered, compact }: { invoice: any; isI
 function TotalsBlock({ invoice, accentColor, compact }: { invoice: any; accentColor: string; compact?: boolean }) {
   const textSize = compact ? "text-xs" : "text-sm"
   const labelClass = compact ? "text-[10px] text-slate-500" : "text-xs text-slate-500"
+  const isInter = invoice.supplyType === "inter"
+  const gstRate = getInvoiceGstRate(invoice)
   return (
     <div className="flex justify-end mb-6">
       <div className={`w-full sm:w-72 space-y-1.5 ${textSize}`}>
@@ -286,13 +305,13 @@ function TotalsBlock({ invoice, accentColor, compact }: { invoice: any; accentCo
           <div className="flex justify-between"><span className={labelClass}>Discount ({invoice.discountPct}%)</span><span className="text-destructive tabular-nums">− {formatINR(invoice.discountAmount)}</span></div>
         )}
         <div className="flex justify-between"><span className={labelClass}>Taxable Amount</span><span className="tabular-nums">{formatINR(invoice.taxableAmount)}</span></div>
-        {invoice.supplyType === "intra" ? (
-          <>
-            <div className="flex justify-between"><span className={labelClass}>CGST</span><span className="tabular-nums">{formatINR(invoice.cgst)}</span></div>
-            <div className="flex justify-between"><span className={labelClass}>SGST</span><span className="tabular-nums">{formatINR(invoice.sgst)}</span></div>
-          </>
+        {isInter ? (
+          <div className="flex justify-between"><span className={labelClass}>{gstTotalLabel(gstRate, true, "igst")}</span><span className="tabular-nums">{formatINR(invoice.igst)}</span></div>
         ) : (
-          <div className="flex justify-between"><span className={labelClass}>IGST</span><span className="tabular-nums">{formatINR(invoice.igst)}</span></div>
+          <>
+            <div className="flex justify-between"><span className={labelClass}>{gstTotalLabel(gstRate, false, "cgst")}</span><span className="tabular-nums">{formatINR(invoice.cgst)}</span></div>
+            <div className="flex justify-between"><span className={labelClass}>{gstTotalLabel(gstRate, false, "sgst")}</span><span className="tabular-nums">{formatINR(invoice.sgst)}</span></div>
+          </>
         )}
         <Separator className="my-2" />
         <div className={`flex justify-between ${compact ? "text-sm" : "text-base"} font-bold`}>
