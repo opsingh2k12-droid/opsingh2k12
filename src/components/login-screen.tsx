@@ -86,6 +86,19 @@ export function LoginScreen() {
         <div className="relative z-10 text-sm opacity-80">
           Trusted by 5,000+ Indian businesses · ⭐ 4.8 on Google
         </div>
+
+        <a
+          href="https://kloudiotech.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative z-10 flex items-center gap-2 text-white/70 hover:text-white transition-colors text-xs group"
+        >
+          <span>Developed by</span>
+          <span className="font-bold text-white">KloudioTech</span>
+          <svg className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M7 17L17 7M17 7H8M17 7V16" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
       </div>
 
       {/* Right login/signup panel */}
@@ -178,6 +191,19 @@ export function LoginScreen() {
               </Card>
             </TabsContent>
           </Tabs>
+
+          <a
+            href="https://kloudiotech.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 mt-6 text-xs text-muted-foreground hover:text-foreground transition-colors group"
+          >
+            <span>Developed by</span>
+            <span className="font-bold">KloudioTech</span>
+            <svg className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M7 17L17 7M17 7H8M17 7V16" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
         </div>
       </div>
     </div>
