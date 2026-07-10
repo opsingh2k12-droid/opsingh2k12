@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Plus, Trash2, Save, FileDown, MessageCircle, Mail, Printer, UserPlus, PackagePlus } from "lucide-react"
 import { useState, useMemo, useEffect } from "react"
 import { formatINR } from "@/lib/format"
+import { INDIAN_STATES } from "@/lib/indian-states"
 import { toast } from "sonner"
 
 interface InvoiceLine {
@@ -447,8 +448,23 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                 <Input value={newParty.city} onChange={(e) => setNewParty({ ...newParty, city: e.target.value })} className="mt-1" />
               </div>
               <div>
-                <Label className="text-xs">State Code</Label>
-                <Input value={newParty.stateCode} onChange={(e) => setNewParty({ ...newParty, stateCode: e.target.value })} className="mt-1" />
+                <Label className="text-xs">State</Label>
+                <Select
+                  value={newParty.stateCode}
+                  onValueChange={(v) => {
+                    const stateName = INDIAN_STATES.find((s) => s.code === v)?.name || ""
+                    setNewParty({ ...newParty, stateCode: v, state: stateName })
+                  }}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select..." /></SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {INDIAN_STATES.map((s) => (
+                      <SelectItem key={s.code} value={s.code}>
+                        {s.code} - {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter>

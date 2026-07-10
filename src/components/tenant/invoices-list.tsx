@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge"
 import { FileText, Plus, Search, FileDown, Filter } from "lucide-react"
 import { useState } from "react"
 import { formatINR, formatDate } from "@/lib/format"
+import { InvoiceDetail } from "@/components/tenant/invoice-detail"
 
 export function InvoicesList({ onNew, docType = "invoice" }: { onNew: () => void; docType?: "invoice" | "estimate" }) {
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<"all" | "paid" | "unpaid" | "partial" | "overdue">("all")
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const isEstimate = docType === "estimate"
   const pageTitle = isEstimate ? "Estimates" : "Sales Invoices"
@@ -19,7 +21,13 @@ export function InvoicesList({ onNew, docType = "invoice" }: { onNew: () => void
   const { data, isLoading } = useQuery({
     queryKey: ["tenant-invoices", docType],
     queryFn: async () => (await fetch(`/api/tenant/invoices?type=${docType}`)).json(),
+    enabled: !selectedId, // Only fetch list when no invoice is selected
   })
+
+  // If an invoice is selected, show detail view
+  if (selectedId) {
+    return <InvoiceDetail invoiceId={selectedId} onBack={() => setSelectedId(null)} docType={docType} />
+  }
 
   const allDocs = (data?.invoices || []).filter((inv: any) => inv.type === docType)
 
@@ -89,7 +97,7 @@ export function InvoicesList({ onNew, docType = "invoice" }: { onNew: () => void
                 ) : invoices.length === 0 ? (
                   <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No {isEstimate ? "estimates" : "invoices"} found. Click "{newButtonLabel}" to create one.</td></tr>
                 ) : invoices.map((inv: any) => (
-                  <tr key={inv.id} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer">
+                  <tr key={inv.id} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" onClick={() => setSelectedId(inv.id)}>
                     <td className="p-3"><div className="font-semibold">{inv.invoiceNumber}</div><div className="text-xs text-muted-foreground">{inv.items.length} items</div></td>
                     <td className="p-3"><div className="font-medium">{inv.party?.name}</div><div className="text-xs text-muted-foreground">{inv.party?.gstin || "Walk-in"}</div></td>
                     <td className="p-3 hidden sm:table-cell text-muted-foreground">{formatDate(inv.invoiceDate)}</td>

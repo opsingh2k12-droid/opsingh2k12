@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Users, Plus, Search, Pencil, Trash2, UserCircle } from "lucide-react"
 import { useState } from "react"
 import { formatINR } from "@/lib/format"
+import { INDIAN_STATES } from "@/lib/indian-states"
 import { toast } from "sonner"
 
 export function TenantParties() {
@@ -19,6 +20,11 @@ export function TenantParties() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editParty, setEditParty] = useState<any>(null)
   const [form, setForm] = useState({ name: "", type: "customer", gstin: "", phone: "", email: "", address: "", city: "", state: "Maharashtra", stateCode: "27", openingBalance: "0" })
+  // State dropdown helper: when stateCode changes, also set state name
+  const setStateField = (stateCode: string) => {
+    const stateName = INDIAN_STATES.find((s) => s.code === stateCode)?.name || ""
+    setForm((prev: any) => ({ ...prev, stateCode, state: stateName }))
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ["tenant-parties"],
@@ -137,8 +143,17 @@ export function TenantParties() {
                   <Input id="city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="mt-1" />
                 </div>
                 <div>
-                  <Label htmlFor="stateCode">State Code</Label>
-                  <Input id="stateCode" value={form.stateCode} onChange={(e) => setForm({ ...form, stateCode: e.target.value })} className="mt-1" />
+                  <Label htmlFor="state">State</Label>
+                  <Select value={form.stateCode} onValueChange={setStateField}>
+                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select state..." /></SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {INDIAN_STATES.map((s) => (
+                        <SelectItem key={s.code} value={s.code}>
+                          {s.code} - {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="col-span-2">
                   <Label htmlFor="openingBalance">Opening Balance (₹) — positive = receivable, negative = payable</Label>
