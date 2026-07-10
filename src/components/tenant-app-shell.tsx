@@ -54,18 +54,6 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
         <span className="font-extrabold text-lg">BillDesk Pro</span>
       </div>
 
-      <div className="px-2 mb-3">
-        <div className="p-3 rounded-lg bg-muted/60 border border-border flex items-center gap-2.5">
-          <Avatar className="w-8 h-8">
-            <AvatarFallback className="bg-primary text-primary-foreground text-xs">{tenantInitials}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold truncate">{tenant.businessName}</div>
-            <div className="text-[10px] text-muted-foreground">{planName} Plan · {tenant.status === "trial" ? "Trial" : tenant.status}</div>
-          </div>
-        </div>
-      </div>
-
       <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
         <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider px-2 py-2">Main</div>
         {navItems.map((item) => (
@@ -138,20 +126,14 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative h-9 w-9">
                   <Bell className="w-5 h-5" />
-                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72">
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-2">
-                  <span className="text-xs font-medium">⚠ Low stock alert</span>
-                  <span className="text-xs text-muted-foreground">3 items need restocking</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-2">
-                  <span className="text-xs font-medium">💰 Payment received</span>
-                  <span className="text-xs text-muted-foreground">₹28,450 from Verma Traders</span>
-                </DropdownMenuItem>
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                  No new notifications
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 

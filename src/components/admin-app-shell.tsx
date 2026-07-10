@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Shield, LayoutDashboard, Building2, CreditCard, BarChart3, Settings, LogOut, Search, Bell, Menu, Palette, Receipt } from "lucide-react"
+import { LayoutDashboard, Building2, CreditCard, BarChart3, Settings, LogOut, Search, Bell, Menu, Palette } from "lucide-react"
 import { AdminDashboard } from "@/components/admin/dashboard"
 import { AdminTenants } from "@/components/admin/tenants"
 import { AdminRevenue } from "@/components/admin/revenue"
@@ -46,18 +46,6 @@ export function AdminAppShell() {
         <div>
           <div className="font-extrabold text-lg leading-tight">BillDesk Pro</div>
           <div className="text-[10px] text-muted-foreground">Admin Console</div>
-        </div>
-      </div>
-
-      <div className="px-2 mb-3">
-        <div className="p-3 rounded-lg bg-muted/60 border border-border flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center">
-            <Shield className="w-4 h-4" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold">Super Admin</div>
-            <div className="text-[10px] text-muted-foreground">Platform Owner</div>
-          </div>
         </div>
       </div>
 
@@ -111,20 +99,14 @@ export function AdminAppShell() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="w-5 h-5" />
-                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72">
-                <DropdownMenuLabel>Platform alerts</DropdownMenuLabel>
+                <DropdownMenuLabel>Platform Alerts</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-2">
-                  <span className="text-xs font-medium">⚠ Payment failed</span>
-                  <span className="text-xs text-muted-foreground">Patel Wholesale — auto-renewal failed</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-2">
-                  <span className="text-xs font-medium">🎉 New signup</span>
-                  <span className="text-xs text-muted-foreground">Gupta General Store joined trial</span>
-                </DropdownMenuItem>
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                  No new alerts
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
