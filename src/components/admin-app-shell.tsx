@@ -42,7 +42,7 @@ export function AdminAppShell() {
   const SidebarContent = (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 px-2 py-4">
-        <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold">B</div>
+        <img src="/kloudiotech-logo.png" alt="BillDesk Pro" className="w-8 h-8 rounded-lg object-contain" />
         <div>
           <div className="font-extrabold text-lg leading-tight">BillDesk Pro</div>
           <div className="text-[10px] text-muted-foreground">Admin Console</div>

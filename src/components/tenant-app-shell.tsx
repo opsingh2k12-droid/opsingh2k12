@@ -50,7 +50,7 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
   const SidebarContent = (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 px-2 py-4">
-        <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold">B</div>
+        <img src="/kloudiotech-logo.png" alt="BillDesk Pro" className="w-8 h-8 rounded-lg object-contain" />
         <span className="font-extrabold text-lg">BillDesk Pro</span>
       </div>
 

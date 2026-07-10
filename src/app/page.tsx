@@ -66,9 +66,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center animate-pulse">
-            <Receipt className="w-6 h-6" />
-          </div>
+          <img src="/kloudiotech-logo.png" alt="BillDesk Pro" className="w-12 h-12 rounded-xl object-contain animate-pulse" />
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="w-4 h-4 animate-spin" /> Loading BillDesk Pro...
           </div>

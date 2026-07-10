@@ -66,9 +66,7 @@ export function LoginScreen() {
         <div className="absolute -bottom-40 -left-20 w-80 h-80 rounded-full bg-white/5" />
 
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur">
-            <Receipt className="w-6 h-6" />
-          </div>
+          <img src="/kloudiotech-logo.png" alt="BillDesk Pro" className="w-12 h-12 rounded-lg object-contain bg-white/95 p-1" />
           <span className="text-2xl font-extrabold">BillDesk Pro</span>
         </div>
 
@@ -107,9 +105,7 @@ export function LoginScreen() {
       <div className="flex items-center justify-center p-4 sm:p-6 lg:p-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-6 sm:mb-8">
-            <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
-              <Receipt className="w-6 h-6" />
-            </div>
+            <img src="/kloudiotech-logo.png" alt="BillDesk Pro" className="w-10 h-10 rounded-lg object-contain" />
             <span className="text-xl font-extrabold">BillDesk Pro</span>
           </div>
 
