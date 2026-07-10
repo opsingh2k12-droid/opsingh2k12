@@ -47,20 +47,20 @@ export function TenantDashboard({ onNavigate }: { onNavigate: (p: TenantPage) =>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {kpis.map((kpi) => (
           <Card key={kpi.label} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-muted-foreground font-medium">{kpi.label}</span>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${kpi.color}/10 text-${kpi.color}`}>
+            <CardContent className="p-3 sm:p-5">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-tight">{kpi.label}</span>
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-${kpi.color}/10 text-${kpi.color} flex-shrink-0`}>
                   {kpi.icon}
                 </div>
               </div>
-              <div className="text-2xl font-bold tabular-nums">{kpi.value}</div>
-              <div className={`text-xs font-medium mt-1 flex items-center gap-1 ${kpi.trendUp ? "text-green-600" : "text-muted-foreground"}`}>
+              <div className="text-lg sm:text-2xl font-bold tabular-nums">{kpi.value}</div>
+              <div className={`text-[10px] sm:text-xs font-medium mt-1 flex items-center gap-1 ${kpi.trendUp ? "text-green-600" : "text-muted-foreground"}`}>
                 {kpi.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                {kpi.trend}
+                <span className="truncate">{kpi.trend}</span>
               </div>
             </CardContent>
           </Card>
@@ -78,7 +78,7 @@ export function TenantDashboard({ onNavigate }: { onNavigate: (p: TenantPage) =>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="border-b bg-muted/30">
                     <th className="text-left font-medium text-muted-foreground p-3 text-xs uppercase tracking-wider">Invoice #</th>
@@ -148,40 +148,40 @@ export function TenantDashboard({ onNavigate }: { onNavigate: (p: TenantPage) =>
       </div>
 
       {/* Quick stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Boxes className="w-5 h-5" /></div>
-            <div>
-              <div className="text-xs text-muted-foreground">Total Items</div>
-              <div className="font-bold text-lg tabular-nums">{data?.totalItems || 0}</div>
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><Boxes className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+            <div className="min-w-0">
+              <div className="text-[10px] sm:text-xs text-muted-foreground truncate">Total Items</div>
+              <div className="font-bold text-base sm:text-lg tabular-nums">{data?.totalItems || 0}</div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Users className="w-5 h-5" /></div>
-            <div>
-              <div className="text-xs text-muted-foreground">Total Parties</div>
-              <div className="font-bold text-lg tabular-nums">{data?.totalParties || 0}</div>
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><Users className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+            <div className="min-w-0">
+              <div className="text-[10px] sm:text-xs text-muted-foreground truncate">Total Parties</div>
+              <div className="font-bold text-base sm:text-lg tabular-nums">{data?.totalParties || 0}</div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><IndianRupee className="w-5 h-5" /></div>
-            <div>
-              <div className="text-xs text-muted-foreground">This Month Sales</div>
-              <div className="font-bold text-lg tabular-nums">{formatINR(data?.monthSales || 0)}</div>
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><IndianRupee className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+            <div className="min-w-0">
+              <div className="text-[10px] sm:text-xs text-muted-foreground truncate">Month Sales</div>
+              <div className="font-bold text-base sm:text-lg tabular-nums">{formatINR(data?.monthSales || 0)}</div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><ShoppingCart className="w-5 h-5" /></div>
-            <div>
-              <div className="text-xs text-muted-foreground">This Month Purchases</div>
-              <div className="font-bold text-lg tabular-nums">{formatINR(data?.monthPurchases || 0)}</div>
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+            <div className="min-w-0">
+              <div className="text-[10px] sm:text-xs text-muted-foreground truncate">Month Purchases</div>
+              <div className="font-bold text-base sm:text-lg tabular-nums">{formatINR(data?.monthPurchases || 0)}</div>
             </div>
           </CardContent>
         </Card>

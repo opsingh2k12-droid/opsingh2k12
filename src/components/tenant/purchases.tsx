@@ -38,7 +38,7 @@ export function PurchasesList() {
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[640px]">
               <thead className="bg-muted/30 border-b">
                 <tr>
                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Bill No.</th>

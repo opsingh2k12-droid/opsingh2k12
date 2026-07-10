@@ -86,7 +86,7 @@ export function TenantReports() {
           <CardTitle className="text-base">Top Selling Items</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted/30 border-b">
               <tr>
                 <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Item</th>
@@ -117,13 +117,13 @@ export function TenantReports() {
 function KpiCard({ label, value, icon, trend, trendUp }: { label: string; value: string; icon: React.ReactNode; trend: string; trendUp: boolean }) {
   return (
     <Card>
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs text-muted-foreground font-medium">{label}</span>
-          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">{icon}</div>
+      <CardContent className="p-3 sm:p-5">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <span className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-tight">{label}</span>
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">{icon}</div>
         </div>
-        <div className="text-2xl font-bold tabular-nums">{value}</div>
-        <div className={`text-xs font-medium mt-1 ${trendUp ? "text-green-600" : "text-muted-foreground"}`}>{trend}</div>
+        <div className="text-lg sm:text-2xl font-bold tabular-nums">{value}</div>
+        <div className={`text-[10px] sm:text-xs font-medium mt-1 ${trendUp ? "text-green-600" : "text-muted-foreground"}`}>{trend}</div>
       </CardContent>
     </Card>
   )

@@ -119,7 +119,7 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
         <div className="lg:col-span-2 space-y-4">
           {/* Invoice meta */}
           <Card>
-            <CardContent className="p-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <CardContent className="p-3 sm:p-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
               <div>
                 <Label className="text-xs">Invoice No.</Label>
                 <Input value="Auto-generated" disabled className="mt-1 text-xs bg-muted/40" />
@@ -175,7 +175,7 @@ export function CreateInvoice({ onDone }: { onDone: () => void }) {
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-sm min-w-[640px]">
                   <thead className="bg-muted/30">
                     <tr>
                       <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase">Item</th>

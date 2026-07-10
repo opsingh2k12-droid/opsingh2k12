@@ -90,14 +90,14 @@ export function AdminAppShell() {
       </aside>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-[280px] p-0 overflow-y-auto">
           {SidebarContent}
         </SheetContent>
       </Sheet>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 flex items-center gap-3 px-4 lg:px-6 py-3 border-b border-border bg-background/80 backdrop-blur">
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)}>
+        <header className="sticky top-0 z-30 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 lg:px-6 py-2.5 sm:py-3 border-b border-border bg-background/80 backdrop-blur">
+          <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 flex-shrink-0" onClick={() => setMobileOpen(true)}>
             <Menu className="w-5 h-5" />
           </Button>
 
@@ -172,7 +172,7 @@ export function AdminAppShell() {
           </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto">
           {page === "dashboard" && <AdminDashboard onNavigate={navigate} />}
           {page === "tenants" && <AdminTenants />}
           {page === "revenue" && <AdminRevenue />}

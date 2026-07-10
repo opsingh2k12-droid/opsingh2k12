@@ -38,16 +38,16 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (p: AdminPage) => v
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {kpis.map((kpi) => (
           <Card key={kpi.label} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-muted-foreground font-medium">{kpi.label}</span>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${kpi.color}/10 text-${kpi.color}`}>{kpi.icon}</div>
+            <CardContent className="p-3 sm:p-5">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-tight">{kpi.label}</span>
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center bg-${kpi.color}/10 text-${kpi.color} flex-shrink-0`}>{kpi.icon}</div>
               </div>
-              <div className="text-2xl font-bold tabular-nums">{kpi.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{kpi.sub}</div>
+              <div className="text-lg sm:text-2xl font-bold tabular-nums">{kpi.value}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">{kpi.sub}</div>
             </CardContent>
           </Card>
         ))}
@@ -83,7 +83,7 @@ export function AdminDashboard({ onNavigate }: { onNavigate: (p: AdminPage) => v
             </Button>
           </CardHeader>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[640px]">
               <thead className="bg-muted/30 border-b">
                 <tr>
                   <th className="text-left p-3 text-xs font-medium text-muted-foreground uppercase">Business</th>

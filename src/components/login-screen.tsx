@@ -89,9 +89,9 @@ export function LoginScreen() {
       </div>
 
       {/* Right login/signup panel */}
-      <div className="flex items-center justify-center p-6 lg:p-12">
+      <div className="flex items-center justify-center p-4 sm:p-6 lg:p-12">
         <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center gap-2 mb-8">
+          <div className="lg:hidden flex items-center gap-2 mb-6 sm:mb-8">
             <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
               <Receipt className="w-6 h-6" />
             </div>

@@ -111,38 +111,34 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
 
       {/* Mobile drawer */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-[280px] p-0 overflow-y-auto">
           {SidebarContent}
         </SheetContent>
       </Sheet>
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 flex items-center gap-3 px-4 lg:px-6 py-3 border-b border-border bg-background/80 backdrop-blur">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="w-5 h-5" />
-              </Button>
-            </SheetTrigger>
-          </Sheet>
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)}>
+        <header className="sticky top-0 z-30 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 lg:px-6 py-2.5 sm:py-3 border-b border-border bg-background/80 backdrop-blur">
+          {/* Mobile menu button */}
+          <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 flex-shrink-0" onClick={() => setMobileOpen(true)}>
             <Menu className="w-5 h-5" />
           </Button>
 
+          {/* Search - hidden on mobile */}
           <div className="relative flex-1 max-w-md hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Search invoices, parties, items..." className="pl-9 bg-muted/40 border-0" />
           </div>
 
-          <div className="ml-auto flex items-center gap-1.5">
-            <Button onClick={() => navigate("create-invoice")} className="gap-1.5 h-9">
+          <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
+            <Button onClick={() => navigate("create-invoice")} className="gap-1.5 h-9 px-3" size="sm">
               <Plus className="w-4 h-4" /> <span className="hidden sm:inline">New Invoice</span>
+              <span className="sm:hidden text-xs">New</span>
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className="relative h-9 w-9">
                   <Bell className="w-5 h-5" />
                   <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive" />
                 </Button>
@@ -165,7 +161,7 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-muted transition-colors">
+                <button className="flex items-center gap-2 p-1 rounded-md hover:bg-muted transition-colors">
                   <Avatar className="w-8 h-8">
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">{initials}</AvatarFallback>
                   </Avatar>
@@ -186,7 +182,7 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto">
           {page === "dashboard" && <TenantDashboard onNavigate={navigate} />}
           {page === "items" && <TenantItems />}
           {page === "parties" && <TenantParties />}
