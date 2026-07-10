@@ -14,7 +14,7 @@ export function LoginScreen() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [signupLoading, setSignupLoading] = useState(false)
-  const [loginData, setLoginData] = useState({ email: "rahul@sharma-electronics.in", password: "rahul123" })
+  const [loginData, setLoginData] = useState({ email: "", password: "" })
   const [signupData, setSignupData] = useState({ businessName: "", email: "", password: "", phone: "", gstin: "", city: "", state: "Maharashtra", stateCode: "27" })
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -125,11 +125,6 @@ export function LoginScreen() {
                       Continue
                     </Button>
                   </form>
-                  <div className="mt-4 p-3 rounded-md bg-muted text-xs text-muted-foreground">
-                    <div className="font-semibold mb-1">Demo accounts:</div>
-                    <div>👨‍💼 Super Admin: admin@billdesk.pro / admin123</div>
-                    <div>🏪 Tenant: rahul@sharma-electronics.in / rahul123</div>
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
