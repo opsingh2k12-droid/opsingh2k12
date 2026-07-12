@@ -23,6 +23,7 @@ interface InvoiceLine {
   rate: number
   gstRate: number
   gstType: "inclusive" | "exclusive"
+  description?: string
 }
 
 export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => void; docType?: "invoice" | "estimate" }) {
@@ -33,7 +34,7 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
   const [discountPct, setDiscountPct] = useState(0)
   const [notes, setNotes] = useState("Thank you for your business. Goods once sold will not be taken back.")
   const [terms, setTerms] = useState("Payment due within 15 days. Interest @18% p.a. on delayed payments.")
-  const [lines, setLines] = useState<InvoiceLine[]>([{ name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive" }])
+  const [lines, setLines] = useState<InvoiceLine[]>([{ name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive", description: "" }])
 
   // Inline add dialogs
   const [showAddParty, setShowAddParty] = useState(false)
@@ -132,7 +133,7 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
     }
   }
 
-  const addLine = () => setLines([...lines, { name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive" }])
+  const addLine = () => setLines([...lines, { name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive", description: "" }])
   const removeLine = (i: number) => setLines(lines.filter((_, idx) => idx !== i))
 
   const totals = useMemo(() => {
@@ -229,14 +230,14 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
           {/* Customer */}
           <Card>
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <Label>Bill To (Customer)</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-sm font-semibold">Bill To (Customer)</Label>
                 <Button type="button" variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setShowAddParty(true)}>
                   <UserPlus className="w-3 h-3" /> New Party
                 </Button>
               </div>
               <Select value={partyId} onValueChange={setPartyId}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select customer..." /></SelectTrigger>
+                <SelectTrigger className="h-10 text-sm"><SelectValue placeholder="Select customer..." /></SelectTrigger>
                 <SelectContent>
                   {customers.map((p: any) => (
                     <SelectItem key={p.id} value={p.id}>{p.name} {p.gstin ? `· ${p.gstin}` : ""}</SelectItem>
@@ -244,7 +245,7 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                 </SelectContent>
               </Select>
               {selectedParty && (
-                <div className="mt-2 text-xs text-muted-foreground grid grid-cols-2 gap-2">
+                <div className="mt-3 text-xs text-muted-foreground grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div>📞 {selectedParty.phone || "—"}</div>
                   <div>📍 {selectedParty.city || "—"}, {selectedParty.state || "—"}</div>
                   <div>🏛 GSTIN: {selectedParty.gstin || "Unregistered"}</div>
@@ -280,6 +281,7 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                     {lines.map((line, i) => {
                       const amount = line.qty * line.rate
                       return (
+                        <>
                         <tr key={i} className="border-t hover:bg-muted/20">
                           <td className="p-2">
                             <ItemCombobox
@@ -313,6 +315,19 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                             </Button>
                           </td>
                         </tr>
+                        {line.name && (
+                          <tr key={`desc-${i}`} className="border-t-0">
+                            <td colSpan={7} className="p-1 pt-0">
+                              <Input
+                                value={line.description || ""}
+                                onChange={(e) => updateLine(i, { description: e.target.value })}
+                                placeholder="Add description for this item (optional)..."
+                                className="h-7 text-xs bg-muted/30 border-dashed"
+                              />
+                            </td>
+                          </tr>
+                        )}
+                        </>
                       )
                     })}
                   </tbody>

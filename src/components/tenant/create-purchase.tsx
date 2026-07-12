@@ -23,6 +23,7 @@ interface PurchaseLine {
   rate: number
   gstRate: number
   gstType: "inclusive" | "exclusive"
+  description?: string
 }
 
 export function CreatePurchase({ onDone }: { onDone: () => void }) {
@@ -32,7 +33,7 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
   const [billDate, setBillDate] = useState(new Date().toISOString().slice(0, 10))
   const [discountPct, setDiscountPct] = useState(0)
   const [notes, setNotes] = useState("")
-  const [lines, setLines] = useState<PurchaseLine[]>([{ name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive" }])
+  const [lines, setLines] = useState<PurchaseLine[]>([{ name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive", description: "" }])
 
   // Inline add dialogs
   const [showAddParty, setShowAddParty] = useState(false)
@@ -115,7 +116,7 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
     }
   }
 
-  const addLine = () => setLines([...lines, { name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive" }])
+  const addLine = () => setLines([...lines, { name: "", hsn: "", qty: 1, rate: 0, gstRate: 18, gstType: "exclusive", description: "" }])
   const removeLine = (i: number) => setLines(lines.filter((_, idx) => idx !== i))
 
   const totals = useMemo(() => {
@@ -198,20 +199,31 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
           {/* Supplier */}
           <Card>
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <Label>Purchase From (Supplier)</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-sm font-semibold">Purchase From (Supplier)</Label>
                 <Button type="button" variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setShowAddParty(true)}>
                   <UserPlus className="w-3 h-3" /> New Supplier
                 </Button>
               </div>
               <Select value={partyId} onValueChange={setPartyId}>
-                <SelectTrigger className="mt-1"><SelectValue placeholder="Select supplier..." /></SelectTrigger>
+                <SelectTrigger className="h-10 text-sm"><SelectValue placeholder="Select supplier..." /></SelectTrigger>
                 <SelectContent>
                   {suppliers.map((p: any) => (
                     <SelectItem key={p.id} value={p.id}>{p.name} {p.gstin ? `· ${p.gstin}` : ""}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {partyId && (() => {
+                const sp = suppliers.find((p: any) => p.id === partyId)
+                return sp ? (
+                  <div className="mt-3 text-xs text-muted-foreground grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div>📞 {sp.phone || "—"}</div>
+                    <div>📍 {sp.city || "—"}, {sp.state || "—"}</div>
+                    <div>🏛 GSTIN: {sp.gstin || "Unregistered"}</div>
+                    <div>💰 Balance: {formatINR(sp.currentBalance)}</div>
+                  </div>
+                ) : null
+              })()}
             </CardContent>
           </Card>
 
@@ -241,6 +253,7 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
                     {lines.map((line, i) => {
                       const amount = line.qty * line.rate
                       return (
+                        <>
                         <tr key={i} className="border-t hover:bg-muted/20">
                           <td className="p-2">
                             <ItemCombobox
@@ -274,6 +287,19 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
                             </Button>
                           </td>
                         </tr>
+                        {line.name && (
+                          <tr key={`desc-${i}`} className="border-t-0">
+                            <td colSpan={7} className="p-1 pt-0">
+                              <Input
+                                value={line.description || ""}
+                                onChange={(e) => updateLine(i, { description: e.target.value })}
+                                placeholder="Add description for this item (optional)..."
+                                className="h-7 text-xs bg-muted/30 border-dashed"
+                              />
+                            </td>
+                          </tr>
+                        )}
+                        </>
                       )
                     })}
                   </tbody>
