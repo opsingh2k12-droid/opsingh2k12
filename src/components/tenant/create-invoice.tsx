@@ -267,13 +267,13 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                 <table className="w-full text-sm min-w-[640px]">
                   <thead className="bg-muted/30">
                     <tr>
-                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "30%" }}>Item</th>
-                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "12%" }}>HSN</th>
-                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "10%" }}>Qty</th>
-                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "15%" }}>Rate</th>
-                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "15%" }}>GST</th>
-                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "15%" }}>Amount</th>
-                      <th style={{ width: "3%" }}></th>
+                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "45%" }}>Item</th>
+                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "10%" }}>HSN</th>
+                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "8%" }}>Qty</th>
+                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "13%" }}>Rate</th>
+                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "10%" }}>GST</th>
+                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "13%" }}>Amount</th>
+                      <th style={{ width: "1%" }}></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -305,14 +305,6 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                                 <SelectItem value="28">28%</SelectItem>
                               </SelectContent>
                             </Select>
-                            <button
-                              type="button"
-                              onClick={() => updateLine(i, { gstType: line.gstType === "inclusive" ? "exclusive" : "inclusive" })}
-                              className={`mt-1 w-full text-[9px] font-semibold px-1 py-0.5 rounded ${line.gstType === "inclusive" ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"}`}
-                              title="Click to toggle GST inclusive/exclusive"
-                            >
-                              {line.gstType === "inclusive" ? "INCL" : "EXCL"}
-                            </button>
                           </td>
                           <td className="p-2 text-right font-semibold tabular-nums">{formatINR(amount)}</td>
                           <td className="p-2">
