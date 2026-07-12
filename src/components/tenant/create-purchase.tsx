@@ -13,6 +13,7 @@ import { useState, useMemo } from "react"
 import { formatINR } from "@/lib/format"
 import { INDIAN_STATES } from "@/lib/indian-states"
 import { toast } from "sonner"
+import { ItemCombobox } from "@/components/item-combobox"
 
 interface PurchaseLine {
   itemId?: string
@@ -165,8 +166,7 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
         <Button variant="outline" size="sm" onClick={() => toast.info("Draft saved")}>Save as Draft</Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="space-y-4">
           {/* Bill meta */}
           <Card>
             <CardContent className="p-3 sm:p-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -243,15 +243,14 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
                       return (
                         <tr key={i} className="border-t hover:bg-muted/20">
                           <td className="p-2">
-                            <Select value={line.itemId || ""} onValueChange={(v) => selectItem(i, v)}>
-                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select item..." /></SelectTrigger>
-                              <SelectContent>
-                                {items.map((it: any) => (
-                                  <SelectItem key={it.id} value={it.id}>{it.name} · {formatINR(it.purchasePrice || it.salePrice)} · Stock: {it.stockQty}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <Input value={line.name} onChange={(e) => updateLine(i, { name: e.target.value })} placeholder="Or type custom name" className="mt-1 h-7 text-xs" />
+                            <ItemCombobox
+                              items={items}
+                              value={line.name}
+                              itemId={line.itemId}
+                              onSelect={(item) => selectItem(i, item.id)}
+                              onType={(name) => updateLine(i, { name, itemId: undefined })}
+                              placeholder="Search or type item..."
+                            />
                           </td>
                           <td className="p-2"><Input value={line.hsn} onChange={(e) => updateLine(i, { hsn: e.target.value })} className="h-8 text-xs" /></td>
                           <td className="p-2"><Input type="number" min="0" step="1" value={line.qty || ""} onChange={(e) => updateLine(i, { qty: e.target.value === "" ? 0 : Number(e.target.value) })} className="h-8 text-xs text-right" /></td>
@@ -303,70 +302,44 @@ export function CreatePurchase({ onDone }: { onDone: () => void }) {
             </CardContent>
           </Card>
 
-          {/* Totals */}
+          {/* Totals + Actions (single block, full width) */}
           <Card>
             <CardContent className="p-4 bg-muted/30">
-              <div className="ml-auto max-w-xs space-y-1.5 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold tabular-nums">{formatINR(totals.subtotal)}</span></div>
-                {totals.discountAmount > 0 && (
-                  <div className="flex justify-between"><span className="text-muted-foreground">Discount ({discountPct}%)</span><span className="font-semibold text-destructive tabular-nums">− {formatINR(totals.discountAmount)}</span></div>
-                )}
-                <div className="flex justify-between"><span className="text-muted-foreground">Taxable Amount</span><span className="font-semibold tabular-nums">{formatINR(totals.taxableAmount)}</span></div>
-                {supplyType === "intra" ? (
-                  <>
-                    <div className="flex justify-between"><span className="text-muted-foreground">CGST</span><span className="tabular-nums">{formatINR(totals.cgst)}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">SGST</span><span className="tabular-nums">{formatINR(totals.sgst)}</span></div>
-                  </>
-                ) : (
-                  <div className="flex justify-between"><span className="text-muted-foreground">IGST</span><span className="tabular-nums">{formatINR(totals.igst)}</span></div>
-                )}
-                <Separator className="my-2" />
-                <div className="flex justify-between text-base font-bold"><span>Total Payable</span><span className="tabular-nums text-primary">{formatINR(totals.grandTotal)}</span></div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Summary sidebar */}
-        <div className="space-y-4">
-          <Card className="lg:sticky lg:top-20">
-            <CardContent className="p-4 space-y-4">
-              <div>
-                <div className="text-xs text-muted-foreground">Total Bill Value</div>
-                <div className="text-2xl font-bold text-primary tabular-nums">{formatINR(totals.grandTotal)}</div>
-              </div>
-              <Separator />
-              <div>
-                <div className="text-xs text-muted-foreground">Items Count</div>
-                <div className="text-sm font-semibold">{lines.length} items · {totalQty} qty</div>
-              </div>
-              <Separator />
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">GST Breakdown (ITC)</div>
-                <div className="text-xs space-y-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Left: Totals */}
+                <div className="space-y-1.5 text-sm">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">Summary</div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold tabular-nums">{formatINR(totals.subtotal)}</span></div>
+                  {totals.discountAmount > 0 && (
+                    <div className="flex justify-between"><span className="text-muted-foreground">Discount ({discountPct}%)</span><span className="font-semibold text-destructive tabular-nums">− {formatINR(totals.discountAmount)}</span></div>
+                  )}
+                  <div className="flex justify-between"><span className="text-muted-foreground">Taxable Amount</span><span className="font-semibold tabular-nums">{formatINR(totals.taxableAmount)}</span></div>
                   {supplyType === "intra" ? (
                     <>
-                      <div className="flex justify-between"><span>CGST</span><span className="tabular-nums">{formatINR(totals.cgst)}</span></div>
-                      <div className="flex justify-between"><span>SGST</span><span className="tabular-nums">{formatINR(totals.sgst)}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">CGST</span><span className="tabular-nums">{formatINR(totals.cgst)}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">SGST</span><span className="tabular-nums">{formatINR(totals.sgst)}</span></div>
                     </>
                   ) : (
-                    <div className="flex justify-between"><span>IGST</span><span className="tabular-nums">{formatINR(totals.igst)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">IGST</span><span className="tabular-nums">{formatINR(totals.igst)}</span></div>
                   )}
                   <div className="flex justify-between font-semibold"><span>Total ITC</span><span className="tabular-nums">{formatINR(totals.totalGst)}</span></div>
+                  <Separator className="my-2" />
+                  <div className="flex justify-between text-base font-bold"><span>Total Payable</span><span className="tabular-nums text-primary">{formatINR(totals.grandTotal)}</span></div>
+                  <div className="text-[10px] text-muted-foreground mt-1">{lines.length} items · {totalQty} qty</div>
+                </div>
+                {/* Right: Actions */}
+                <div className="space-y-2 md:border-l md:pl-4">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">Actions</div>
+                  <Button className="w-full" onClick={() => handleSave("unpaid")} disabled={createMutation.isPending}>
+                    <Save className="w-4 h-4 mr-2" /> Save Purchase Bill
+                  </Button>
+                  <p className="text-[10px] text-muted-foreground text-center">
+                    💡 Stock will automatically increase when you save.
+                  </p>
                 </div>
               </div>
-              <Separator />
-              <div className="space-y-2">
-                <Button className="w-full" onClick={() => handleSave("unpaid")} disabled={createMutation.isPending}>
-                  <Save className="w-4 h-4 mr-2" /> Save Purchase Bill
-                </Button>
-              </div>
-              <p className="text-[10px] text-muted-foreground text-center">
-                💡 Stock will automatically increase when you save.
-              </p>
             </CardContent>
           </Card>
-        </div>
       </div>
 
       {/* Inline Add Supplier Dialog */}
