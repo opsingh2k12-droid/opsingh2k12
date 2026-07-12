@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { ShoppingCart, Plus, FileDown } from "lucide-react"
 import { formatINR, formatDate } from "@/lib/format"
 
-export function PurchasesList() {
+export function PurchasesList({ onNew }: { onNew: () => void }) {
   const { data, isLoading } = useQuery({
     queryKey: ["tenant-purchases"],
     queryFn: async () => (await fetch("/api/tenant/purchases")).json(),
@@ -25,7 +25,7 @@ export function PurchasesList() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm"><FileDown className="w-4 h-4 mr-1.5" /> Export</Button>
-          <Button className="gap-1.5"><Plus className="w-4 h-4" /> New Purchase Bill</Button>
+          <Button onClick={onNew} className="gap-1.5"><Plus className="w-4 h-4" /> New Purchase Bill</Button>
         </div>
       </div>
 

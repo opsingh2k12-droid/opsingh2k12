@@ -15,9 +15,10 @@ import { InvoicesList } from "@/components/tenant/invoices-list"
 import { PurchasesList } from "@/components/tenant/purchases"
 import { TenantReports } from "@/components/tenant/reports"
 import { TenantSettings } from "@/components/tenant/settings"
+import { CreatePurchase } from "@/components/tenant/create-purchase"
 import { useAppTheme, THEMES, ThemeName } from "@/lib/theme-context"
 
-export type TenantPage = "dashboard" | "items" | "parties" | "create-invoice" | "create-estimate" | "invoices" | "estimates" | "purchases" | "reports" | "settings"
+export type TenantPage = "dashboard" | "items" | "parties" | "create-invoice" | "create-estimate" | "create-purchase" | "invoices" | "estimates" | "purchases" | "reports" | "settings"
 
 const navItems: { id: TenantPage; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
@@ -170,7 +171,8 @@ export function TenantAppShell({ tenant }: { tenant: any }) {
           {page === "create-estimate" && <CreateInvoice onDone={() => navigate("estimates")} docType="estimate" />}
           {page === "invoices" && <InvoicesList onNew={() => navigate("create-invoice")} docType="invoice" />}
           {page === "estimates" && <InvoicesList onNew={() => navigate("create-estimate")} docType="estimate" />}
-          {page === "purchases" && <PurchasesList />}
+          {page === "purchases" && <PurchasesList onNew={() => navigate("create-purchase")} />}
+          {page === "create-purchase" && <CreatePurchase onDone={() => navigate("purchases")} />}
           {page === "reports" && <TenantReports />}
           {page === "settings" && <TenantSettings tenant={tenant} />}
         </main>
