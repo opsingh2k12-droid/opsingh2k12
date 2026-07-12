@@ -293,8 +293,8 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                             <Input value={line.name} onChange={(e) => updateLine(i, { name: e.target.value })} placeholder="Or type custom name" className="mt-1 h-7 text-xs" />
                           </td>
                           <td className="p-2"><Input value={line.hsn} onChange={(e) => updateLine(i, { hsn: e.target.value })} className="h-8 text-xs" /></td>
-                          <td className="p-2"><Input type="number" min="1" step="0.01" value={line.qty} onChange={(e) => updateLine(i, { qty: Number(e.target.value) })} className="h-8 text-xs text-right" /></td>
-                          <td className="p-2"><Input type="number" step="0.01" value={line.rate} onChange={(e) => updateLine(i, { rate: Number(e.target.value) })} className="h-8 text-xs text-right" /></td>
+                          <td className="p-2"><Input type="number" min="0" step="0.01" value={line.qty || ""} onChange={(e) => updateLine(i, { qty: e.target.value === "" ? 0 : Number(e.target.value) })} className="h-8 text-xs text-right" /></td>
+                          <td className="p-2"><Input type="number" min="0" step="0.01" value={line.rate || ""} onChange={(e) => updateLine(i, { rate: e.target.value === "" ? 0 : Number(e.target.value) })} className="h-8 text-xs text-right" /></td>
                           <td className="p-2">
                             <Select value={String(line.gstRate)} onValueChange={(v) => updateLine(i, { gstRate: Number(v) })}>
                               <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
