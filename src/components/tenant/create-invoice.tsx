@@ -263,7 +263,7 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
               </Button>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
+              <div className="overflow-x-visible">
                 <table className="w-full text-sm min-w-[640px]">
                   <thead className="bg-muted/30">
                     <tr>

@@ -74,8 +74,8 @@ export function ItemCombobox({ items, value, itemId, onSelect, onType, placehold
       {open && filtered.length > 0 && (
         <div
           ref={dropdownRef}
-          className="fixed z-[9999] mt-1 max-h-60 min-w-[320px] overflow-y-auto bg-white border border-border rounded-md shadow-xl"
-          style={{ width: "max-content", maxWidth: "400px" }}
+          className="absolute z-50 mt-1 max-h-60 min-w-[300px] overflow-y-auto bg-white border border-border rounded-md shadow-xl"
+          style={{ width: "max-content", maxWidth: "380px" }}
         >
           {filtered.map((item: any) => (
             <button
@@ -100,8 +100,8 @@ export function ItemCombobox({ items, value, itemId, onSelect, onType, placehold
       )}
       {open && filtered.length === 0 && search && (
         <div
-          className="fixed z-[9999] mt-1 min-w-[320px] bg-white border border-border rounded-md shadow-xl px-3 py-2 text-xs text-muted-foreground"
-          style={{ width: "max-content", maxWidth: "400px" }}
+          className="absolute z-50 mt-1 min-w-[300px] bg-white border border-border rounded-md shadow-xl px-3 py-2 text-xs text-muted-foreground"
+          style={{ width: "max-content", maxWidth: "380px" }}
         >
           No items match. Custom name will be used: <span className="font-medium">"{search}"</span>
         </div>
