@@ -267,13 +267,13 @@ export function CreateInvoice({ onDone, docType = "invoice" }: { onDone: () => v
                 <table className="w-full text-sm min-w-[640px]">
                   <thead className="bg-muted/30">
                     <tr>
-                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase">Item</th>
-                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase w-20">HSN</th>
-                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase w-16">Qty</th>
-                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase w-24">Rate</th>
-                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase w-24">GST</th>
-                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase w-28">Amount</th>
-                      <th className="w-8"></th>
+                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "30%" }}>Item</th>
+                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "12%" }}>HSN</th>
+                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "10%" }}>Qty</th>
+                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "15%" }}>Rate</th>
+                      <th className="text-left p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "15%" }}>GST</th>
+                      <th className="text-right p-2 text-xs font-medium text-muted-foreground uppercase" style={{ width: "15%" }}>Amount</th>
+                      <th style={{ width: "3%" }}></th>
                     </tr>
                   </thead>
                   <tbody>
